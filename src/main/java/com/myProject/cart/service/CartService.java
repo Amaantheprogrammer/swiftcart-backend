@@ -44,7 +44,7 @@ public class CartService {
     public CartResponse updateItemQuantity(Long productId, Integer quantity) {
         User user = currentUserUtil.getCurrentUser();
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new InsufficientResourceException("Product not found with ID: " + productId));
         Cart cart = user.getCart();
         if (cart == null) {
             cart = Cart.builder().user(user).build();
@@ -60,7 +60,7 @@ public class CartService {
                 cart.getCartItems().remove(item);
             } else {
                 if (product.getStockQuantity() < newQuantity) {
-                    throw new BadRequestException("Insufficient stock for product: " + product.getName());
+                    throw new InsufficientResourceException("Insufficient stock for product: " + product.getName());
                 }
                 item.setQuantity(newQuantity);
             }
@@ -69,7 +69,7 @@ public class CartService {
                 throw new BadRequestException("Initial product quantity must be greater than zero.");
             }
             if (product.getStockQuantity() < quantity) {
-                throw new BadRequestException("Insufficient stock for product: " + product.getName());
+                throw new InsufficientResourceException("Insufficient stock for product: " + product.getName());
             }
             CartItem newItem = CartItem.builder()
                     .product(product)
