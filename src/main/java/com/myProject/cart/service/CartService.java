@@ -28,7 +28,7 @@ public class CartService {
     private final CurrentUserUtil currentUserUtil;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
-    @Transactional(readOnly = true)
+    @Transactional
     public CartResponse getMyCart() {
         User user = currentUserUtil.getCurrentUser();
         Cart cart = user.getCart();
