@@ -1,12 +1,10 @@
 package com.myProject.service;
 
-import com.myProject.entity.Wishlist;
-import com.myProject.entity.WishlistItem;
+import com.myProject.entity.*;
 import com.myProject.exception.*;
-import com.myProject.entity.Product;
+import com.myProject.entity.*;
 import com.myProject.repository.ProductRepository;
 import com.myProject.util.CurrentUserUtil;
-import com.myProject.entity.User;
 import com.myProject.dto.response.WishlistResponse;
 import com.myProject.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;

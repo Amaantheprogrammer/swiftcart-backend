@@ -3,6 +3,7 @@ package com.myProject.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.myProject.dto.request.ImageRequest;
 import com.myProject.dto.response.AuthResponse;
 import com.myProject.dto.request.NewProductRequest;
 import com.myProject.dto.response.ProductResponse;
@@ -96,7 +97,7 @@ public class ProductController {
     @Operation(
             summary = "Add image"
     )
-    public ResponseEntity<Void> addImage(@PathVariable Long id, @Valid @RequestBody AuthResponse.ImageRequest imageRequest) {
+    public ResponseEntity<Void> addImage(@PathVariable Long id, @Valid @RequestBody ImageRequest imageRequest) {
         productService.addImage(id, imageRequest);
         return ResponseEntity.noContent().build();
     }
@@ -105,7 +106,7 @@ public class ProductController {
     @Operation(
             summary = "Update image"
     )
-    public ResponseEntity<Void> updateImage(@PathVariable Long id, @PathVariable Long imageId, @Valid @RequestBody AuthResponse.ImageRequest imageRequest) {
+    public ResponseEntity<Void> updateImage(@PathVariable Long id, @PathVariable Long imageId, @Valid @RequestBody ImageRequest imageRequest) {
         productService.updateImage(id, imageId, imageRequest);
         return ResponseEntity.noContent().build();
     }

@@ -4,13 +4,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.myProject.entity.Category;
-import com.myProject.dto.response.AuthResponse;
-import com.myProject.dto.request.NewProductRequest;
-import com.myProject.dto.response.ProductResponse;
-import com.myProject.dto.request.UpdateProductRequest;
-import com.myProject.entity.Product;
-import com.myProject.entity.ProductImage;
+import com.myProject.dto.request.*;
+import com.myProject.entity.*;
+import com.myProject.dto.response.*;
 import com.myProject.util.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.*;
@@ -20,17 +16,13 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.repository.CategoryRepository;
+import com.myProject.repository.*;
 import com.myProject.exception.*;
-import com.myProject.repository.ProductRepository;
-import com.myProject.entity.User;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -147,7 +139,7 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "myProducts", allEntries = true)
     })
-    public void addImage(Long id, AuthResponse.ImageRequest imageRequest) {
+    public void addImage(Long id, ImageRequest imageRequest) {
         Product product = getProductOrThrow(id);
         validateProductAuthority(product);
         boolean imageExists = product.getProductImages()
@@ -173,7 +165,7 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "myProducts", allEntries = true)
     })
-    public void updateImage(Long id, Long imageId, AuthResponse.ImageRequest imageRequest) {
+    public void updateImage(Long id, Long imageId, ImageRequest imageRequest) {
         Product product = getProductOrThrow(id);
         validateProductAuthority(product);
         ProductImage productImage = product.getProductImages()

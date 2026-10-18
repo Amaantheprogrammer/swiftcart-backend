@@ -3,6 +3,7 @@ package com.myProject.exception;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import com.myProject.dto.response.ErrorResponse;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,15 @@ public class GlobalExceptionHandler {
                     .timestamp(LocalDateTime.now())
                     .build();
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+        }
+
+        @ExceptionHandler(InvalidRefreshTokenException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .message(ex.getMessage())
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)

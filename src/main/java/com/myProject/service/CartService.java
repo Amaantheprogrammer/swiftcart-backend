@@ -2,8 +2,7 @@ package com.myProject.service;
 
 import java.util.Optional;
 
-import com.myProject.entity.Cart;
-import com.myProject.entity.CartItem;
+import com.myProject.entity.*;
 import com.myProject.util.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,11 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.dto.response.CartResponse;
-import com.myProject.repository.CartRepository;
+import com.myProject.repository.*;
 import com.myProject.exception.*;
-import com.myProject.entity.Product;
-import com.myProject.repository.ProductRepository;
-import com.myProject.entity.User;
 
 import lombok.RequiredArgsConstructor;
 

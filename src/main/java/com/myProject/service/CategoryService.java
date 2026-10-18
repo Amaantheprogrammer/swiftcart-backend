@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.myProject.dto.request.CategoryRequest;
 import com.myProject.dto.response.CategoryResponse;
-import com.myProject.exception.DuplicateResourceException;
+import com.myProject.exception.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.myProject.entity.Category;
 import com.myProject.repository.CategoryRepository;
-import com.myProject.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
