@@ -1,7 +1,7 @@
 package com.myProject.service;
 
-import com.myProject.user.entity.User;
-import com.myProject.user.repository.UserRepository;
+import com.myProject.entity.User;
+import com.myProject.repository.UserRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;

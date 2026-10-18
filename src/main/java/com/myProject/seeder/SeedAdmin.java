@@ -1,10 +1,12 @@
 package com.myProject.seeder;
 
+import com.myProject.entity.User;
+import com.myProject.enums.PaymentMethod;
+import com.myProject.enums.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.myProject.user.entity.*;
-import com.myProject.user.repository.UserRepository;
+import com.myProject.repository.UserRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

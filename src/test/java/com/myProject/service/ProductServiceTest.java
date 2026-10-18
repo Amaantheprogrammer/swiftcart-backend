@@ -1,13 +1,17 @@
 package com.myProject.service;
 
-import com.myProject.category.entity.Category;
-import com.myProject.category.repository.CategoryRepository;
-import com.myProject.product.dto.*;
-import com.myProject.product.entity.*;
-import com.myProject.product.repository.ProductRepository;
-import com.myProject.product.service.ProductService;
-import com.myProject.user.entity.*;
-import com.myProject.security.user.CurrentUserUtil;
+import com.myProject.entity.Category;
+import com.myProject.repository.CategoryRepository;
+import com.myProject.dto.request.NewProductRequest;
+import com.myProject.dto.response.ProductResponse;
+import com.myProject.dto.request.UpdateProductRequest;
+import com.myProject.entity.Product;
+import com.myProject.entity.ProductImage;
+import com.myProject.entity.User;
+import com.myProject.enums.PaymentMethod;
+import com.myProject.enums.Role;
+import com.myProject.repository.ProductRepository;
+import com.myProject.util.CurrentUserUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;

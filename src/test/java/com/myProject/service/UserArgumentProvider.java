@@ -1,6 +1,6 @@
 package com.myProject.service;
 
-import com.myProject.user.entity.User;
+import com.myProject.entity.User;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
