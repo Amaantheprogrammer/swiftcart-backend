@@ -18,7 +18,7 @@ public class RefreshTokenService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public String createRefreshToken(String email) {
-        String refreshToken  = UUID.randomUUID().toString();
+        String refreshToken = UUID.randomUUID().toString();
         redisTemplate.opsForValue().set(
                 "refresh_token:" + refreshToken,
                 email,

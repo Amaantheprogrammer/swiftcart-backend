@@ -31,7 +31,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully!");
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(HttpServletRequest request, HttpServletResponse response) {
         authService.signOut(request, response);
         return ResponseEntity.noContent().build();
