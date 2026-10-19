@@ -1,864 +1,584 @@
 # 🛒 Swift Cart: E-Commerce Backend Platform
 
-**A secure, modular, and performance-conscious e-commerce backend built with Java and Spring Boot.**
+**A Java and Spring Boot backend for marketplace workflows, including
+product discovery, carts, wishlists, order management, and role-based
+access.**
 
-Swift Cart is a RESTful e-commerce backend designed to handle the core operations of an online shopping platform, including user authentication, product discovery, shopping carts, wishlists, order processing, and external service integration.
+Swift Cart exposes REST APIs for the core operations of an online
+shopping platform. It uses Spring Security and JWT-based authentication,
+persists application data with MySQL and Spring Data JPA, and uses Redis
+for caching. The project also demonstrates communication with an
+external digital banking service through Spring's `RestClient`.
 
-Built using **Spring Boot 3, Spring Security, MySQL, Redis, and JWT**, the project focuses on secure API development, role-based access control, maintainable architecture, and integration with external services.
+🌐 **Live application:** https://e-commercebackendproject.onrender.com\
+📚 **Live API documentation:**
+https://e-commercebackendproject.onrender.com/swagger-ui/index.html\
+💻 **Source code:**
+https://github.com/Amaantheprogrammer/Swift-Cart-Backend-Project
 
-The next phase of Swift Cart is focused on exploring **Generative AI and Retrieval-Augmented Generation (RAG)** to make product discovery and shopping assistance more intelligent.
+> **API count note:** The source archive currently contains 44
+> controller mappings. The live Swagger listing shared separately shows
+> a different set of operations, so this README uses "40+ REST API
+> operations" rather than implying that the deployed and repository
+> versions are identical.
 
-🌐 **Live Application:** https://e-commercebackendproject.onrender.com
+------------------------------------------------------------------------
 
-📚 **API Documentation:** [Explore Swagger UI](https://e-commercebackendproject.onrender.com/swagger-ui/index.html)
+## ✨ Highlights
 
----
+-   🔐 **Authentication:** JWT access tokens, refresh-token workflows,
+    BCrypt password hashing, sign-in, sign-up, sign-out, and token
+    refresh.
+-   👥 **Role-based access:** Role-aware access for administrators,
+    users, and sellers.
+-   🛍️ **Marketplace workflows:** Product and category management,
+    product images, carts, wishlists, and order operations.
+-   🔎 **Product discovery:** Search by product name, optional price
+    filtering, category-based browsing, and paginated product retrieval.
+-   ⚡ **Redis caching:** Configured cache regions and expiry policies
+    for selected product, category, and user reads.
+-   🔗 **Service integration:** A `RestClient` integration for supported
+    operations against a separate digital banking service.
+-   🧱 **Layered design:** Controllers, services, repositories,
+    entities, request/response DTOs, and centralized exception handling.
+-   📖 **Interactive documentation:** OpenAPI documentation through
+    Swagger UI.
+-   ☁️ **Deployment:** Publicly deployed application and a Dockerfile
+    for container builds.
+-   🤖 **AI roadmap:** Planned exploration of semantic product discovery
+    and Retrieval-Augmented Generation (RAG); these AI capabilities are
+    not implemented in the current backend.
 
-## ✨ Key Highlights
-
-* 🔐 **Secure Authentication:** JWT-based authentication with stateless session management and BCrypt password hashing.
-* 👥 **Role-Based Authorization:** Separate access permissions for administrators, customers, and sellers.
-* 📦 **Product Discovery:** Product search, category-based filtering, price filtering, and pagination.
-* 🛍️ **Shopping Experience:** Dedicated APIs for shopping carts, wishlists, and order placement.
-* ⚡ **Redis Integration:** Configurable caching for frequently accessed application data.
-* 💳 **External Service Integration:** REST client integration with a digital banking service for account and transaction operations.
-* 🧩 **Modular Architecture:** Features organized into dedicated controllers, services, repositories, entities, and DTOs.
-* 🛡️ **Centralized Error Handling:** Consistent exception handling and request validation.
-* 📚 **API Documentation:** Interactive API documentation using OpenAPI and Swagger UI.
-* ☁️ **Cloud Deployment:** Deployed application with environment-based configuration.
-* 🤖 **AI Roadmap:** Planned exploration of LLMs, LangChain, and RAG for intelligent product discovery and shopping assistance.
-
----
+------------------------------------------------------------------------
 
 ## 🚀 Features
 
-### 1. Authentication & Security
+### 1. Authentication and security
 
-Swift Cart uses Spring Security and JSON Web Tokens to secure its REST APIs.
+The application uses Spring Security with a custom JWT authentication
+filter and method-level authorization.
 
-Implemented capabilities include:
+Implemented flows include:
 
-* User registration and login.
-* JWT generation and validation.
-* Stateless authentication.
-* Custom JWT authentication filter.
-* BCrypt password hashing.
-* Role-based access control.
-* Retrieval of the currently authenticated user.
-* Protected endpoints based on application permissions.
+-   User registration and sign-in.
+-   JWT access-token generation and validation.
+-   Refresh-token handling through a refresh-token cookie.
+-   Sign-out and refresh-token invalidation.
+-   BCrypt password hashing.
+-   Role-based authorization for protected operations.
 
-**Authentication endpoints**
+Authentication routes in the source include:
 
-| Method | Endpoint        | Description                          |
-| ------ | --------------- | ------------------------------------ |
-| POST   | `/auth/sign-up` | Register a new user                  |
-| POST   | `/auth/sign-in` | Authenticate a user and obtain a JWT |
+  -----------------------------------------------------------------------
+  Method                  Endpoint                Purpose
+  ----------------------- ----------------------- -----------------------
+  `POST`                  `/auth/sign-up`         Register a user
 
-Authenticated requests use the following header:
+  `POST`                  `/auth/sign-in`         Authenticate and obtain
+                                                  tokens
 
-```http
-Authorization: Bearer <your-jwt-token>
+  `POST`                  `/auth/sign-out`        Sign out and clear the
+                                                  refresh-token cookie
+
+  `POST`                  `/auth/refresh`         Refresh the access
+                                                  token
+  -----------------------------------------------------------------------
+
+For protected API calls, send the access token as a bearer token:
+
+``` http
+Authorization: Bearer <access-token>
 ```
 
-### 2. User Management
+The refresh-token flow also relies on the cookie returned by the
+authentication endpoints.
 
-User-related APIs support account management and authenticated user operations.
+### 2. User management
 
-Capabilities include:
+User operations include:
 
-* Retrieve user information.
-* Update user details.
-* Delete user accounts.
-* Retrieve user-specific information.
-* Manage user roles and payment preferences through the application's user model.
+-   Retrieve users and individual user records.
+-   Retrieve the authenticated user's profile.
+-   Update the current user's details.
+-   Delete a user.
+-   Apply configured access controls to user operations.
 
-### 3. Product Management & Discovery
+### 3. Product management and discovery
 
-Product APIs support product creation, maintenance, and discovery.
+Product functionality includes:
 
-Capabilities include:
+-   Create, retrieve, update, and delete products.
+-   Retrieve products with pagination.
+-   Search products by name.
+-   Apply an optional maximum-price filter to search results.
+-   Browse products by category, with optional price filtering.
+-   Retrieve products belonging to the authenticated seller.
+-   Add, update, and delete product images.
+-   Restrict product creation and modification to authorized sellers and
+    validate ownership for seller-managed products.
 
-* Create, retrieve, update, and delete products.
-* Retrieve products using pagination.
-* Retrieve individual products by ID.
-* Search products by name.
-* Apply optional price filters.
-* Browse products by category.
-* Retrieve products belonging to the authenticated seller.
-* Add, update, and delete product images.
+Example requests (check Swagger for the exact parameters and schemas):
 
-**Example API requests**
-
-Retrieve a paginated list of products:
-
-```http
+``` http
 GET /products?page=0&size=10
-```
-
-Retrieve a product by ID:
-
-```http
 GET /products/1
-```
-
-Search for products by name:
-
-```http
 GET /products/search?name=phone
-```
-
-Search for products by name with a price filter:
-
-```http
 GET /products/search?name=phone&price=50000
-```
-
-Retrieve products belonging to a particular category:
-
-```http
 GET /products/category/1
+GET /products/me
 ```
 
-*Note: These examples assume the endpoint paths and query parameters match the deployed application's controller mappings.*
+### 4. Category management
 
-### 4. Category Management
+Category operations support creating, listing, retrieving, updating, and
+deleting categories. Category search is also defined in the source
+controller. Products can be associated with categories and retrieved by
+category.
 
-Category APIs organize products into meaningful groups.
+### 5. Shopping cart
 
-Capabilities include:
+Cart APIs support the current user's cart:
 
-* Create categories.
-* Retrieve categories.
-* Update categories.
-* Delete categories.
-* Associate products with categories.
-* Retrieve products belonging to a category.
+  Method     Endpoint                     Purpose
+  ---------- ---------------------------- --------------------------------------
+  `GET`      `/carts/my-cart`             Retrieve the current user's cart
+  `POST`     `/carts/items`               Add a product or update its quantity
+  `DELETE`   `/carts/items/{productId}`   Remove a product
+  `DELETE`   `/carts/clear`               Clear the cart
 
-### 5. Shopping Cart
+### 6. Wishlists
 
-Swift Cart provides dedicated APIs for managing a customer's shopping cart.
+Customers can maintain a list of products they want to revisit:
 
-Capabilities include:
+  Method     Endpoint                   Purpose
+  ---------- -------------------------- --------------------------------------
+  `GET`      `/wishlists`               Retrieve the current user's wishlist
+  `POST`     `/wishlists/{productId}`   Add a product
+  `DELETE`   `/wishlists/{productId}`   Remove a product
+  `DELETE`   `/wishlists`               Clear the wishlist
 
-* Retrieve the authenticated user's cart.
-* Add products to the cart.
-* Update product quantities.
-* Remove individual products.
-* Clear the entire cart.
-* Place orders directly from the cart.
+### 7. Order management
 
-**Cart endpoints**
+Order workflows include placing orders directly or from the cart,
+retrieving orders, cancelling orders, and updating order and payment
+statuses.
 
-| Method | Endpoint                   | Description                          |
-| ------ | -------------------------- | ------------------------------------ |
-| GET    | `/carts/my-cart`           | Retrieve the current user's cart     |
-| POST   | `/carts/items`             | Add a product or update its quantity |
-| DELETE | `/carts/items/{productId}` | Remove a product from the cart       |
-| DELETE | `/carts/clear`             | Clear the cart                       |
+  Method    Endpoint                             Purpose
+  --------- ------------------------------------ ------------------------------------
+  `GET`     `/orders`                            Retrieve orders
+  `GET`     `/orders/{orderId}`                  Retrieve an order by ID
+  `GET`     `/orders/user/{userId}`              Retrieve orders for a user
+  `GET`     `/orders/me`                         Retrieve the current user's orders
+  `POST`    `/orders/place-order`                Place an order
+  `POST`    `/orders/cart/place-order`           Place an order from the cart
+  `PATCH`   `/orders/{orderId}/cancel`           Cancel an order
+  `PATCH`   `/orders/{orderId}/order-status`     Update order status
+  `PATCH`   `/orders/{orderId}/payment-status`   Update payment status
 
-### 6. Wishlist Management
+Access to these operations depends on the authorization rules and
+business logic implemented in the application.
 
-Customers can maintain a separate collection of products they want to revisit.
+### 8. External digital banking service
 
-Capabilities include:
+A dedicated `RestClient` is configured to communicate with a separate
+digital banking backend. The integration includes supported account and
+transaction requests and forwards authentication credentials for
+applicable calls.
 
-* Retrieve the current user's wishlist.
-* Add products to the wishlist.
-* Remove products from the wishlist.
-* Clear the wishlist.
+This demonstrates service-to-service REST communication. It should
+**not** be interpreted as a claim that Swift Cart integrates with a
+production payment gateway. The banking service must be running and its
+base URL and authentication requirements must match the environment.
 
-| Method | Endpoint                 | Description           |
-| ------ | ------------------------ | --------------------- |
-| GET    | `/wishlists`             | Retrieve the wishlist |
-| POST   | `/wishlists/{productId}` | Add a product         |
-| DELETE | `/wishlists/{productId}` | Remove a product      |
-| DELETE | `/wishlists`             | Clear the wishlist    |
+### 9. Redis caching
 
-### 7. Order Management
+Redis is configured as the Spring cache provider. Cache regions in the
+source include selected product lists and lookups, product search
+results, category data, and user lookups.
 
-The order module handles order placement and subsequent order operations.
+Configured time-to-live policies include:
 
-Capabilities include:
+-   Product-related cache regions: **30 minutes**
+-   Category cache region: **12 hours**
+-   User-related cache regions: **10 minutes**
 
-* Place orders.
-* Place orders using the shopping cart.
-* Retrieve orders with pagination.
-* Retrieve individual orders.
-* Retrieve orders associated with a user.
-* Retrieve the authenticated user's orders.
-* Cancel orders.
-* Update order statuses.
-* Update payment statuses.
+The code also uses cache eviction for selected product mutations. Actual
+performance gains depend on workload, cache hit rate, invalidation
+behavior, and deployment configuration; no performance improvement is
+claimed here without a reproducible benchmark.
 
-**Order endpoints**
+### 10. Validation and error handling
 
-| Method | Endpoint                           | Description                        |
-| ------ | ---------------------------------- | ---------------------------------- |
-| GET    | `/orders`                          | Retrieve orders with pagination    |
-| GET    | `/orders/{orderId}`                | Retrieve an order by ID            |
-| GET    | `/orders/user/{userId}`            | Retrieve orders for a user         |
-| GET    | `/orders/me`                       | Retrieve the current user's orders |
-| POST   | `/orders/place-order`              | Place an order directly            |
-| POST   | `/orders/cart/place-order`         | Place an order using the cart      |
-| PATCH  | `/orders/{orderId}/cancel`         | Cancel an order                    |
-| PATCH  | `/orders/{orderId}/order-status`   | Update order status                |
-| PATCH  | `/orders/{orderId}/payment-status` | Update payment status              |
+The application uses Jakarta Bean Validation and centralized exception
+handling through `@RestControllerAdvice`. Custom exception types cover
+scenarios such as bad requests, missing resources, duplicate resources,
+insufficient resources, and invalid refresh tokens.
 
-Actual access permissions and business rules are enforced by the application's security configuration and service layer.
+------------------------------------------------------------------------
 
-### 8. External Digital Banking Integration
+## 🧰 Technology stack
 
-Swift Cart includes a dedicated REST client that communicates with an external digital banking service.
+  Technology                       Role
+  -------------------------------- -----------------------------------
+  Java 21                          Programming language
+  Spring Boot 3                    Application framework
+  Spring Web                       REST API development
+  Spring Security                  Authentication and authorization
+  JWT (JJWT)                       Access-token handling
+  BCrypt                           Password hashing
+  Spring Data JPA                  Persistence layer
+  Hibernate ORM                    Object-relational mapping
+  MySQL                            Relational database
+  Redis                            Caching and refresh-token support
+  Spring `RestClient`              External service communication
+  Spring Boot Actuator             Application monitoring support
+  Springdoc OpenAPI / Swagger UI   API documentation
+  Maven                            Dependency management and build
+  Lombok                           Boilerplate reduction
+  ModelMapper                      DTO/entity mapping
+  JUnit, Spring Boot Test          Testing dependencies
 
-The integration uses Spring's `RestClient` and forwards the authenticated user's bearer token when making supported requests.
-
-Implemented operations include:
-
-* Retrieve the user's accounts.
-* Retrieve an account using its account number.
-* Initiate withdrawal requests.
-* Initiate deposit requests.
-
-This module demonstrates how a Spring Boot application can communicate with another backend service while propagating authentication credentials.
-
-**Important:** The external banking service must be configured and available for these operations to work. This integration should not be interpreted as a claim that a production payment gateway has been implemented.
-
-### 9. Redis Caching
-
-Swift Cart includes Redis-backed Spring caching configuration.
-
-The configured cache regions cover frequently accessed data, including:
-
-* Products.
-* Products retrieved by ID.
-* Product search results.
-* Products filtered by category and price.
-* Categories.
-* Users.
-* Users retrieved by ID.
-* Users retrieved by email.
-
-Configured cache expiration periods range from 10 minutes to 12 hours, depending on the cache region.
-
-Redis is intended to reduce repeated database work for suitable read operations.
-
-The actual performance benefit depends on which service methods use caching, cache invalidation behavior, and the deployed Redis configuration.
-
-### 10. Validation & Exception Handling
-
-The application uses Jakarta Bean Validation and centralized exception handling.
-
-Capabilities include:
-
-* Request payload validation.
-* Resource-not-found handling.
-* Bad-request handling.
-* Duplicate-resource handling.
-* Insufficient-resource handling.
-* Consistent error response structures.
-
-Centralized exception handling is implemented using Spring's `@RestControllerAdvice`.
-
----
-
-## 🛠️ Technology Stack
-
-| Technology               | Purpose                          |
-| ------------------------ | -------------------------------- |
-| Java 21                  | Core programming language        |
-| Spring Boot 3            | Application framework            |
-| Spring Web               | REST API development             |
-| Spring Security 6        | Authentication and authorization |
-| JWT                      | Stateless authentication         |
-| BCrypt                   | Password hashing                 |
-| Spring Data JPA          | Database persistence             |
-| Hibernate ORM            | Object-relational mapping        |
-| MySQL                    | Relational database              |
-| Redis                    | Caching infrastructure           |
-| Spring RestClient        | External service communication   |
-| Spring Boot Actuator     | Application monitoring endpoints |
-| Springdoc OpenAPI        | API documentation                |
-| Maven                    | Dependency management and builds |
-| Lombok                   | Boilerplate reduction            |
-| ModelMapper              | Object mapping                   |
-| JUnit & Spring Boot Test | Automated testing                |
-
----
+------------------------------------------------------------------------
 
 ## 🏗️ Architecture
 
-Swift Cart follows a modular, layered backend structure.
+Swift Cart uses a layered structure to separate HTTP handling, business
+logic, persistence, and integrations.
 
-```text
+``` text
                          Client
-                            |
-                            v
-                   Spring Boot REST API
-                            |
-                +-----------+-----------+
-                |                       |
-                v                       v
-          Spring Security          Controllers
-                |                       |
-                v                       v
-        JWT Authentication           Services
-                |                       |
-                |              +--------+--------+
-                |              |                 |
-                |              v                 v
-                |        Repositories      External REST Client
-                |              |                 |
-                |              v                 v
-                |            MySQL       Digital Banking Service
-                |
-                +---- Role-Based Authorization
+                           |
+                           v
+                  Spring Boot REST API
+                           |
+                    Spring Security
+                   JWT Authentication
+                           |
+                           v
+                      Controllers
+                           |
+                           v
+                        Services
+                       /        \
+                      v          v
+                Repositories   RestClient
+                      |          |
+                      v          v
+                    MySQL   Digital Banking API
 
-                     Redis Cache
-                          |
-                          v
-                  Cached Application Data
+                  Redis Cache
+                      |
+                      v
+             Cached application data
 ```
 
-### Architectural Responsibilities
+**Controllers** expose endpoints and handle HTTP requests and
+responses.\
+**Services** coordinate application workflows and business rules.\
+**Repositories** provide database access through Spring Data JPA.\
+**DTOs** define API request and response structures.\
+**Security components** authenticate requests and apply configured
+authorization rules.\
+**Redis** provides caching and supports refresh-token functionality.\
+**RestClient** communicates with the separate banking service.
 
-**Controllers**
+------------------------------------------------------------------------
 
-* Expose HTTP endpoints.
-* Accept requests and return HTTP responses.
-* Delegate business operations to service classes.
+## 👥 Application roles
 
-**Services**
+The application defines three roles:
 
-* Implement application business logic.
-* Coordinate repositories and other services.
-* Handle operations such as cart updates and order placement.
+  -----------------------------------------------------------------------
+  Role                                Intended area
+  ----------------------------------- -----------------------------------
+  `ROLE_ADMIN`                        Authorized administrative
+                                      operations
 
-**Repositories**
+  `ROLE_USER`                         Customer operations such as carts,
+                                      wishlists, and orders
 
-* Provide database access through Spring Data JPA.
+  `ROLE_SELLER`                       Seller-owned product creation and
+                                      management
+  -----------------------------------------------------------------------
 
-**DTOs**
+Actual access is determined by the endpoint rules and method-level
+authorization in the code.
 
-* Define request and response structures.
-* Separate API payloads from persistence entities.
+------------------------------------------------------------------------
 
-**Security**
+## 📂 Project structure
 
-* Validate JWTs.
-* Establish authenticated user context.
-* Enforce configured authorization rules.
-
-**External REST Client**
-
-* Communicates with the digital banking service.
-* Forwards authentication credentials for supported operations.
-
-**Redis**
-
-* Provides the configured caching infrastructure for suitable application data.
-
-This separation helps keep API handling, business logic, persistence, and external integrations independently maintainable.
-
----
-
-## 👥 User Roles
-
-Swift Cart defines three application roles:
-
-| Role          | Intended Responsibilities                                                 |
-| ------------- | ------------------------------------------------------------------------- |
-| `ROLE_ADMIN`  | Administrative operations and authorized user and order management        |
-| `ROLE_USER`   | Product discovery, shopping cart, wishlist, and customer order operations |
-| `ROLE_SELLER` | Product creation and management for sellers                               |
-
-The exact permissions available to each role depend on the endpoint authorization rules implemented in the application.
-
----
-
-## 📂 Project Structure
-
-The following illustrates the main feature modules and architectural layers.
-
-```text
+``` text
 src/
-├── main/
-│   ├── java/com/myProject/
-│   │   ├── auth/
-│   │   ├── cart/
-│   │   ├── category/
-│   │   ├── order/
-│   │   ├── payment/
-│   │   ├── product/
-│   │   ├── user/
-│   │   ├── wishlist/
-│   │   ├── rest_client/
-│   │   ├── security/
-│   │   │   ├── jwt/
-│   │   │   └── user/
-│   │   ├── config/
-│   │   ├── exception/
-│   │   ├── admin_seeder/
-│   │   ├── health/
-│   │   └── ECommerceBackendProjectApplication.java
-│   │
-│   └── resources/
-│       └── application.yml
-│
-└── test/
-    └── java/com/myProject/
+└── main/
+    ├── java/com/myProject/
+    │   ├── config/
+    │   ├── controller/
+    │   ├── dto/
+    │   │   ├── request/
+    │   │   └── response/
+    │   ├── entity/
+    │   ├── enums/
+    │   ├── exception/
+    │   ├── filter/
+    │   ├── repository/
+    │   ├── seeder/
+    │   ├── service/
+    │   └── ECommerceBackendProjectApplication.java
+    └── resources/
 ```
 
-Feature modules may contain controllers, DTOs, entities, repositories, and services according to their implementation.
+Feature-specific behavior is implemented across the controller, service,
+repository, entity, and DTO layers. Configuration files should be
+supplied for the target environment and should not contain committed
+production secrets.
 
----
+------------------------------------------------------------------------
 
-## 📚 API Documentation
+## 📚 API documentation
 
-Swift Cart uses Springdoc OpenAPI to provide interactive API documentation.
+Use the live Swagger UI to inspect available endpoints, HTTP methods,
+parameters, and request/response schemas:
 
-### Live API Documentation
+**[Open Swift Cart Swagger
+UI](https://e-commercebackendproject.onrender.com/swagger-ui/index.html)**
 
-**[Open Swagger UI](https://e-commercebackendproject.onrender.com/swagger-ui/index.html)**
+For a local instance, open:
 
-### Local API Documentation
-
-When running the application locally, open:
-
-```text
+``` text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-Swagger UI allows you to:
+The deployed API documentation may not match the source archive if the
+deployed service and repository are on different revisions. Check the
+deployment revision before relying on an exact endpoint count.
 
-* Explore documented endpoints.
-* Inspect request and response schemas.
-* Review HTTP methods and parameters.
-* Execute API requests.
-* Test authenticated endpoints using a JWT.
-
----
+------------------------------------------------------------------------
 
 ## ⚙️ Configuration
 
-Swift Cart uses **`application.yml`** for application configuration and environment-specific settings.
+Configure the database, Redis, JWT settings, server port, and external
+banking-service URL for your environment. Do not commit credentials or
+production secrets.
 
-The configuration supports environment variables for database credentials, Redis, JWT authentication, and the server port.
+The application uses Hibernate schema validation (`ddl-auto: validate`)
+in the configuration described for this project. The database schema
+must therefore be compatible with the entity mappings before the
+application starts.
 
-### Environment Variables
+Common configuration values used by the project include:
 
-| Variable                     | Purpose                        | Default                                 |
-| ---------------------------- | ------------------------------ | --------------------------------------- |
-| `SPRING_DATASOURCE_URL`      | MySQL JDBC connection URL      | Local MySQL database URL                |
-| `SPRING_DATASOURCE_USERNAME` | Database username              | `root`                                  |
-| `SPRING_DATASOURCE_PASSWORD` | Database password              | `root`                                  |
-| `REDIS_URL`                  | Redis connection URL           | `redis://localhost:6379`                |
-| `JWT_SECRET`                 | JWT signing secret             | Configured fallback in the current YAML |
-| `JWT_EXPIRATION`             | JWT expiration in milliseconds | `3600000`                               |
-| `PORT`                       | HTTP server port               | `8080`                                  |
+  Setting                        Purpose
+  ------------------------------ -----------------------------------------------
+  `SPRING_DATASOURCE_URL`        MySQL JDBC URL
+  `SPRING_DATASOURCE_USERNAME`   Database username
+  `SPRING_DATASOURCE_PASSWORD`   Database password
+  `REDIS_URL`                    Redis connection URL
+  `JWT_SECRET`                   JWT signing secret
+  `JWT_EXPIRATION`               Access-token lifetime in milliseconds
+  `PORT`                         HTTP port supplied by the deployment platform
 
-### Application YAML
+The exact property names and defaults must match the `application.yml`
+used by your local checkout/deployment. The uploaded source archive does
+not include that YAML file, so verify or add the environment-specific
+configuration before running the application.
 
-The following excerpts illustrate the configuration used by the application.
+**Security checklist**
 
-**MySQL and JPA**
+-   Use a unique, strong JWT secret outside local development.
+-   Do not use a development fallback secret in production.
+-   Keep database credentials out of source control.
+-   Use least-privilege database credentials.
+-   Review cookie security and CORS settings for the deployed
+    environment.
+-   Avoid enabling verbose SQL logging in production unless needed.
 
-```yaml
-spring:
-  application:
-    name: E-CommerceBackendProject
+------------------------------------------------------------------------
 
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ecommerceDb?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
-```
-
-**Database schema validation**
-
-The `ddl-auto: validate` setting instructs Hibernate to validate the database schema against the application's entity mappings rather than automatically creating or updating tables.
-
-Ensure that the required schema exists before starting the application.
-
-**Redis caching**
-
-```yaml
-spring:
-  data:
-    redis:
-      url: ${REDIS_URL:redis://localhost:6379}
-
-  cache:
-    type: redis
-```
-
-Redis is configured as the application's cache provider. A reachable Redis instance is required for the configured caching infrastructure to operate.
-
-**JWT authentication**
-
-```yaml
-jwt:
-  secret: ${JWT_SECRET:your-development-secret}
-  expiration: ${JWT_EXPIRATION:3600000}
-```
-
-The example above illustrates the configuration structure. The actual project currently contains a hardcoded fallback value for `JWT_SECRET`.
-
-The default expiration of `3600000` milliseconds represents one hour.
-
-**Server port**
-
-```yaml
-server:
-  port: ${PORT:8080}
-```
-
-The application uses the port provided by the deployment environment when `PORT` is set, otherwise defaulting to port `8080`.
-
-### Security Considerations
-
-* Configure a strong, unique JWT signing secret through `JWT_SECRET` in deployed environments.
-* Avoid using a hardcoded fallback secret in production.
-* Never commit production credentials or secrets to version control.
-* Use appropriate database credentials instead of development defaults.
-* Consider disabling SQL statement logging in production unless it is needed for debugging.
-
-**Important:** If a publicly deployed application has used the fallback JWT secret, configure a new secret and rotate it. Existing tokens signed with the previous secret will no longer validate after rotation.
-
----
-
-## ▶️ Getting Started
+## ▶️ Getting started
 
 ### Prerequisites
 
-Install the following:
+-   JDK 21
+-   MySQL
+-   Redis
+-   Git
+-   Access to the external digital banking service if you want to test
+    its integration
 
-* Java Development Kit (JDK) 21.
-* MySQL.
-* Redis.
-* Git.
+### 1. Clone the repository
 
-You will also need access to the external digital banking service to use its integration endpoints.
-
-### 1. Clone the Repository
-
-```bash
-git clone <your-github-repository-url>
+``` bash
+git clone https://github.com/Amaantheprogrammer/Swift-Cart-Backend-Project.git
+cd Swift-Cart-Backend-Project
 ```
 
-### 2. Navigate to the Project
+If your repository's actual name or default branch differs, use the
+corresponding clone URL and directory name.
 
-```bash
-cd Swift-Cart-Backend-Project-main
-```
+### 2. Configure dependencies
 
-Use the actual directory name created when you clone your repository.
+Create/configure the MySQL database and ensure the schema matches the
+JPA entities. Start Redis and configure the database, JWT, and external
+service settings for your environment.
 
-### 3. Configure MySQL
+Because the project uses schema validation, Hibernate will validate
+existing tables rather than automatically creating or updating the
+schema.
 
-Create the MySQL database and ensure that the required tables are present.
-
-The default local configuration expects:
-
-```text
-Database: ecommerceDb
-Username: root
-Password: root
-```
-
-These are development defaults from the YAML configuration, not recommended production credentials.
-
-Alternatively, configure your own values through environment variables.
+### 3. Run the application
 
 **Windows PowerShell:**
 
-```powershell
-$env:SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/ecommerceDb?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
-$env:SPRING_DATASOURCE_USERNAME="your-username"
-$env:SPRING_DATASOURCE_PASSWORD="your-password"
-```
-
-### 4. Configure Redis
-
-Ensure that Redis is running and accessible.
-
-The default configuration expects Redis at:
-
-```text
-redis://localhost:6379
-```
-
-To use a different Redis instance, configure `REDIS_URL` accordingly.
-
-### 5. Configure JWT
-
-Set `JWT_SECRET` to a strong, unique secret appropriate for your environment.
-
-For example, in Windows PowerShell:
-
-```powershell
-$env:JWT_SECRET="your-unique-development-secret"
-$env:JWT_EXPIRATION="3600000"
-```
-
-Use a securely generated secret rather than copying a publicly visible example into a deployed environment.
-
-### 6. Configure External Services
-
-Configure any environment-specific settings required by the digital banking service.
-
-Ensure the service is reachable and that the authentication credentials required by the integration are available.
-
-### 7. Run the Application
-
-**Windows:**
-
-```bash
-mvnw.cmd spring-boot:run
+``` powershell
+.\mvnw.cmd spring-boot:run
 ```
 
 **Linux/macOS:**
 
-```bash
+``` bash
 ./mvnw spring-boot:run
 ```
 
-Alternatively, build the application:
+Build the project with:
 
-```bash
+``` bash
 ./mvnw clean package
 ```
 
-Then execute the generated JAR from the build output directory.
+Then open the local Swagger UI at
+`http://localhost:8080/swagger-ui/index.html`.
 
-### 8. Explore the APIs
+### 4. Container build
 
-Open Swagger UI:
+A `Dockerfile` is included. To build an image from the repository root:
 
-```text
-http://localhost:8080/swagger-ui/index.html
+``` bash
+docker build -t swift-cart-backend .
 ```
 
-Register an account, authenticate to obtain a JWT, and use the token to access protected endpoints according to their configured permissions.
+Run the image with the required database, Redis, JWT, and
+external-service configuration supplied for your environment. A
+reachable MySQL and Redis instance are still required.
 
-> **Configuration note:** The commands above illustrate a local development setup. The database schema, JWT settings, Redis instance, and any required external services must be configured appropriately before the application can run successfully.
-
----
+------------------------------------------------------------------------
 
 ## 🧪 Testing
 
-The project includes a test structure using Spring Boot Test and service-level tests.
-
-Run the test suite using:
+The project includes Spring Boot Test and Spring Security Test
+dependencies. Run the test suite with:
 
 **Windows:**
 
-```bash
-mvnw.cmd test
+``` powershell
+.\mvnw.cmd test
 ```
 
 **Linux/macOS:**
 
-```bash
+``` bash
 ./mvnw test
 ```
 
-Testing should cover critical application workflows, including:
+Important areas to cover with automated tests include authentication and
+authorization, product ownership rules, cart and wishlist operations,
+order placement and cancellation, validation, cache invalidation, and
+failures from external service calls.
 
-* Authentication and authorization.
-* Product management.
-* Shopping cart operations.
-* Wishlist operations.
-* Order placement and cancellation.
-* Validation and exception handling.
-* Cache behavior.
-* External service integration.
+------------------------------------------------------------------------
 
-Expanding automated test coverage for security rules, business logic, and failure scenarios is a valuable next step.
+## 🤖 Roadmap: AI-powered shopping assistance
 
----
+Generative AI and RAG are planned extensions, not features of the
+current backend.
 
-## 🤖 Future Roadmap: AI-Powered Shopping Assistant
+### Phase 1 --- Product knowledge base
 
-The next phase of Swift Cart explores how Generative AI can improve product discovery and the overall shopping experience.
+-   Extract product names, descriptions, categories, and specifications.
+-   Normalize product data.
+-   Generate embeddings.
+-   Store vectors in a vector database.
 
-Rather than introducing a chatbot that simply generates generic responses, the objective is to build an assistant that retrieves relevant product information and uses it to answer customer questions.
+### Phase 2 --- Retrieval-Augmented Generation
 
-**The following are planned enhancements, not currently implemented features.**
+Retrieve relevant product records before asking a language model to
+answer customer questions, for example:
 
-### Phase 1: Product Knowledge Base
+-   "Find a laptop for programming under ₹60,000."
+-   "Compare these two products."
+-   "Which products match these requirements?"
 
-Build a searchable knowledge base from Swift Cart's product catalogue.
+Responses should be grounded in retrieved catalogue data and link back
+to the relevant products.
 
-Planned tasks:
+### Phase 3 --- Dedicated AI service
 
-* Ingest product descriptions, specifications, and category information.
-* Clean and prepare product data.
-* Chunk text where appropriate.
-* Generate vector embeddings.
-* Store embeddings in a vector database.
-* Retrieve relevant product information through semantic similarity.
+A possible future design is to keep Spring Boot responsible for core
+business logic and introduce a Python service for retrieval and
+generation.
 
-### Phase 2: Retrieval-Augmented Generation (RAG)
-
-Develop a shopping assistant that retrieves relevant product information before generating a response.
-
-Potential customer queries include:
-
-* "Which laptop is suitable for programming under ₹60,000?"
-* "Compare these two products."
-* "Find products with features similar to this one."
-* "What are the main differences between these products?"
-* "Which products match my requirements?"
-
-The system would retrieve relevant information from the product catalogue and provide it to the language model as context.
-
-This approach aims to make responses more relevant and grounded in the application's actual product data.
-
-### Phase 3: Spring Boot and AI Integration
-
-Keep Swift Cart's existing Spring Boot backend as the core business application while introducing a dedicated AI service.
-
-A possible architecture is:
-
-```text
-                    Customer
-                       |
-                       v
-                Swift Cart API
-                 Spring Boot
-                       |
-                       v
-                AI Assistant API
-                    Python
-                       |
-             +---------+---------+
-             |                   |
-             v                   v
-       Retrieval Pipeline    Language Model
-             |
-             v
-       Embedding Model
-             |
-             v
-       Vector Database
-             |
-             v
-      Relevant Product Data
-             |
-             v
-      Contextual Generation
-             |
-             v
-        Assistant Response
+``` text
+Customer
+   |
+   v
+Swift Cart Backend (Spring Boot)
+   |
+   v
+AI Service (Python / FastAPI)
+   |
+   +--> Retrieval pipeline --> Vector database
+   |
+   +--> Language model
+   |
+   v
+Grounded response with product references
 ```
 
-The AI service could use Python, LangChain, and a suitable embedding model while communicating with the Spring Boot backend through an internal REST API.
+Potential tools include LangChain, an embedding model, and a vector
+database selected according to evaluation and deployment needs.
 
-The final technology choices will depend on evaluation, cost, latency, and deployment requirements.
+### Phase 4 --- Reliability and safety
 
-### Phase 4: Context-Aware Product Discovery
+-   Evaluate retrieval relevance and answer quality.
+-   Return product references with grounded answers.
+-   Handle cases where the catalogue has no relevant result.
+-   Measure latency and cost.
+-   Enforce authentication and authorization for customer-specific data.
+-   Prevent the AI service from bypassing backend permissions or
+    directly performing sensitive business actions.
 
-Potential improvements include:
+------------------------------------------------------------------------
 
-* Natural-language product search.
-* Semantic recommendations based on customer requirements.
-* Product comparisons grounded in retrieved product data.
-* Follow-up questions that preserve conversational context.
-* Product references in generated responses.
-* Better handling of ambiguous shopping requests.
+## 🎯 Engineering concepts
 
-### Phase 5: Reliable AI Workflows
+-   REST API design and layered architecture
+-   JWT authentication and role-based authorization
+-   JPA entity relationships and relational data modeling
+-   Pagination, filtering, and search
+-   DTO-based API contracts
+-   Centralized validation and exception handling
+-   Redis caching and cache eviction
+-   External REST service integration
+-   Environment-specific configuration
+-   OpenAPI documentation
+-   Container builds with Docker
 
-Further development could explore:
-
-* Retrieval evaluation.
-* Hallucination reduction.
-* Grounded answers with product references.
-* Response quality and latency monitoring.
-* Authentication and authorization for AI endpoints.
-* Protection against unauthorized access to customer-specific information.
-* Fallback behavior when relevant product information cannot be retrieved.
-
-The objective is to integrate AI into the existing application without allowing an LLM to bypass authorization rules or independently perform sensitive business operations.
-
----
-
-## 🎯 Engineering Concepts Demonstrated
-
-Swift Cart brings together several backend engineering concepts:
-
-* RESTful API design.
-* Layered application architecture.
-* Authentication and authorization.
-* JWT-based stateless security.
-* Role-based access control.
-* Relational database modeling.
-* Object-relational mapping.
-* Pagination and filtering.
-* DTO-based request and response handling.
-* Centralized exception handling.
-* Request validation.
-* Redis caching configuration.
-* External REST API integration.
-* Environment-based configuration.
-* Application deployment.
-* Automated testing.
-* API documentation.
-* Generative AI and RAG integration as a planned extension.
-
----
-
-## 🗺️ Future Backend Improvements
-
-Beyond AI integration, potential improvements include:
-
-* Refresh token workflows.
-* Email verification and password recovery.
-* Expanded unit and integration test coverage.
-* CI/CD automation.
-* Improved cache invalidation and performance measurement.
-* More comprehensive API authorization tests.
-* Production-oriented observability and structured logging.
-* Improved inventory consistency and concurrency handling.
-* Payment workflow hardening.
-* Containerized development and deployment.
-* Improved management of environment-specific configuration.
-
-These improvements should be prioritized according to application requirements rather than treated as completed capabilities.
-
----
+------------------------------------------------------------------------
 
 ## 👨‍💻 Author
 
 **Amaan Shakil Coatwala**
 
-Backend development interests:
+Interests: Java, Spring Boot, backend engineering, REST APIs, databases,
+caching, system design, and Generative AI.
 
-* Java
-* Spring Boot
-* Spring Security
-* REST API Development
-* MySQL and JPA
-* Redis
-* Backend Architecture
-* Generative AI
-* LangChain
-* Retrieval-Augmented Generation
+-   **GitHub:** https://github.com/Amaantheprogrammer
+-   **LinkedIn:** https://www.linkedin.com/in/amaan-coatwala/
 
----
+------------------------------------------------------------------------
 
 ## ⭐ Support
 
-If you find Swift Cart interesting, consider starring the repository.
-
-Suggestions, issues, and contributions that improve the application's architecture, security, performance, and functionality are welcome.
+If you find Swift Cart useful or interesting, consider starring the
+repository. Feedback and contributions that improve its security,
+architecture, testing, and functionality are welcome.
