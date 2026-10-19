@@ -26,7 +26,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class AuthService {
 
-    @Value("${jwt.refresh-expiration:604800000}")
+    @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
     private final AuthenticationManager authenticationManager;

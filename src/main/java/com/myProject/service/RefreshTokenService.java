@@ -12,7 +12,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    @Value("${jwt.refresh-expiration:604800000}")
+    @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
     private final RedisTemplate<String, String> redisTemplate;
