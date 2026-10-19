@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentStatusUpdateRequest {
-    @NotBlank(message = "Payment status is required")
+    @NotNull(message = "Payment status is required")
     private PaymentStatus paymentStatus;
 }

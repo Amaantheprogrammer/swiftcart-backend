@@ -21,10 +21,10 @@ public class SignupRequest {
     @Size(min = 6, message = "Password should have at least 6 characters")
     private String password;
 
-    @NotBlank(message = "Payment method is a required field")
+    @NotNull(message = "Payment method is a required field")
     private PaymentMethod paymentMethod;
 
-    @NotBlank(message = "Role is a required field")
+    @NotNull(message = "Role is a required field")
     private Role role;
 
     @NotBlank(message = "Address is a required field")
