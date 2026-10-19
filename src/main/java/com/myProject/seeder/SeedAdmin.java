@@ -15,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class SeedAdmin {
 
-    @Value("${admin.name}")
+    @Value("${admin.name:Amaan}")
     private String adminName;
-    @Value("${admin.email}")
+    @Value("${admin.email:admin@ecommerce.com}")
     private String adminEmail;
-    @Value("${admin.password}")
+    @Value("${admin.password:admin123}")
     private String adminPassword;
 
     private final UserRepository userRepository;
