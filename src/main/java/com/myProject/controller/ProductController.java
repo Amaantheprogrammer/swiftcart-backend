@@ -3,11 +3,8 @@ package com.myProject.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.myProject.dto.request.ImageRequest;
-import com.myProject.dto.response.AuthResponse;
-import com.myProject.dto.request.NewProductRequest;
-import com.myProject.dto.response.ProductResponse;
-import com.myProject.dto.request.UpdateProductRequest;
+import com.myProject.dto.request.*;
+import com.myProject.dto.response.*;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;

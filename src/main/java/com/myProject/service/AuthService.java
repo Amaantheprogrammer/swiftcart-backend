@@ -88,7 +88,7 @@ public class AuthService {
     public AuthResponse refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         String currentRefreshToken = extractCookie(request, "refreshToken");
         if (currentRefreshToken == null) {
-            throw new InvalidRefreshTokenException("Refresh token missing"); // Or custom exception
+            throw new InvalidRefreshTokenException("Refresh token missing");
         }
 
         String email = refreshTokenService.verifyAndGetEmail(currentRefreshToken);
