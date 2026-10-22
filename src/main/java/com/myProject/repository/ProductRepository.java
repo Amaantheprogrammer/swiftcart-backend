@@ -11,9 +11,17 @@ import com.myProject.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @EntityGraph(attributePaths = {"category", "productImages"})
+    @EntityGraph(attributePaths = {"category", "productImages", "user"})
     @Query("SELECT p FROM Product p WHERE p.approved = true")
     Page<Product> findAllApprovedProducts(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category", "productImages", "user"})
+    @Query("SELECT p FROM Product p WHERE p.approved = false")
+    Page<Product> findPendingProducts(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category", "productImages", "user"})
+    @Query("SELECT p FROM Product p")
+    Page<Product> findAllProductsAdmin(Pageable pageable);
     
     @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Product> findByNameContainingIgnoreCase(@Param("name") String name);

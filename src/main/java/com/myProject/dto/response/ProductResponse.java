@@ -23,4 +23,6 @@ public class ProductResponse implements Serializable {
     private LocalDateTime updatedAt;
     private Long categoryId;
     private String categoryName;
+    private boolean approved;
+    private String userName;
 }

@@ -37,6 +37,20 @@ public class ProductService {
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> getPendingProducts(Pageable pageable) {
+        return productRepository.findPendingProducts(pageable)
+                .map(product -> modelMapper.map(product, ProductResponse.class));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> getAllProductsAdmin(Pageable pageable) {
+        return productRepository.findAllProductsAdmin(pageable)
+                .map(product -> modelMapper.map(product, ProductResponse.class));
+    }
+
     @Transactional(readOnly = true)
     @Cacheable(value = "productsById", key = "#id")
     public ProductResponse getProductById(Long id) {

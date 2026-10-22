@@ -51,6 +51,24 @@ public class ProductController {
         return ResponseEntity.ok(productService.getMyProducts());
     }
 
+    @GetMapping("/pending")
+    @Operation(
+            summary = "Get pending (unapproved) products",
+            description = "Admin only - get all products awaiting approval"
+    )
+    public ResponseEntity<Page<ProductResponse>> getPendingProducts(Pageable pageable) {
+        return ResponseEntity.ok(productService.getPendingProducts(pageable));
+    }
+
+    @GetMapping("/admin")
+    @Operation(
+            summary = "Get all products (admin view including unapproved)",
+            description = "Admin only - get all products regardless of approval status"
+    )
+    public ResponseEntity<Page<ProductResponse>> getAllProductsAdmin(Pageable pageable) {
+        return ResponseEntity.ok(productService.getAllProductsAdmin(pageable));
+    }
+
     @GetMapping("/search")
     @Operation(
         summary = "Get products with name and price",
