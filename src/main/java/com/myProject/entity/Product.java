@@ -47,7 +47,7 @@ public class Product {
 
     @Column(name = "approved")
     @Builder.Default
-    private boolean approved;
+    private boolean approved = false;
 
     // Owning side
     @ManyToOne(fetch = FetchType.LAZY)
