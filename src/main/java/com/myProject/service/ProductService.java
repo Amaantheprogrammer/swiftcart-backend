@@ -33,7 +33,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "products")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        return productRepository.findAllProducts(pageable)
+        return productRepository.findAllApprovedProducts(pageable)
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
 
@@ -101,6 +101,19 @@ public class ProductService {
         product.getProductImages().add(image);
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+    })
+    public void approveProduct(Long id) {
+        Product product = getProductOrThrow(id);
+        product.setApproved(true);
+        productRepository.save(product);
     }
 
     @PreAuthorize("hasRole('SELLER')")

@@ -45,6 +45,10 @@ public class Product {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "approved")
+    @Builder.Default
+    private boolean approved;
+
     // Owning side
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false) 

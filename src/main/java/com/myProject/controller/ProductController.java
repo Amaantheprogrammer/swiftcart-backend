@@ -81,6 +81,15 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createNewProduct(newProductRequest));
     }
 
+    @PutMapping("/{id}/approve")
+    @Operation(
+            summary = "Approve product"
+    )
+    public ResponseEntity<Void> approveProduct(@PathVariable Long id) {
+        productService.approveProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{id}")
     @Operation(
         summary = "Update product",
