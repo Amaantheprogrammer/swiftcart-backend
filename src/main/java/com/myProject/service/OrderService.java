@@ -99,40 +99,45 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
-        User user = currentUserUtil.getCurrentUser();
+        User customer = currentUserUtil.getCurrentUser();
         Long productId = orderRequest.getProductId();
         Product product = productRepository.findById(productId)
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
                         "Product not found with ID: " + productId));
+        User seller = product.getUser();
+        if (seller.getAccountNumber() == null || seller.getAccountNumber().isBlank()) {
+            throw new ResourceNotFoundException("Seller does not have a linked bank account for payouts.");
+        }
         Integer quantity = orderRequest.getQuantity();
-        PaymentMethod paymentMethod = user.getPaymentMethod();
+        PaymentMethod paymentMethod = customer.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
         if (stockQuantity < quantity) {
             throw new InsufficientResourceException("Insufficient stock for product: " + product.getName());
         }
         BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-            if (digitalBankingClientService.getMyAccounts().isEmpty()) {
-                throw new ResourceNotFoundException("No active bank account for the user");
+            if (customer.getAccountNumber() == null && orderRequest.getAccountNumber() == null) {
+                throw new BadRequestException("Transfer cannot proceed without account number");
             }
-            if (orderRequest.getAccountNumber() == null) {
-                throw new ResourceNotFoundException("No account number found");
-            }
-            AccountResponse account = digitalBankingClientService.getAccountByNumber(orderRequest.getAccountNumber());
-            if (account.getBalance().compareTo(totalAmount) < 0) {
+            String customerAccountNumber = orderRequest.getAccountNumber() != null
+                    ? orderRequest.getAccountNumber()
+                    : customer.getAccountNumber();
+            AccountResponse account = digitalBankingClientService.getAccountByNumber(customerAccountNumber);
+            if (account.getBalance().subtract(totalAmount).compareTo(BigDecimal.ZERO) < 0) {
                 throw new InsufficientResourceException("Insufficient balance in the account");
             }
-            TransactionRequest withdrawRequest = TransactionRequest.builder()
-                    .accountNumber(orderRequest.getAccountNumber())
+            TransferRequest request = TransferRequest.builder()
+                    .customerAccountNumber(customerAccountNumber)
+                    .sellerAccountNumber(seller.getAccountNumber())
                     .amount(totalAmount)
                     .build();
-            digitalBankingClientService.withdraw(withdrawRequest);
+            digitalBankingClientService.transfer(request);
         }
         Order order = Order.builder()
-                .user(user)
+                .user(customer)
                 .seller(product.getUser())
-                .address(orderRequest.getAddress() != null ? orderRequest.getAddress() : user.getAddress())
+                .address(orderRequest.getAddress() != null ? orderRequest.getAddress() : customer.getAddress())
                 .totalAmount(totalAmount)
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)

@@ -1,5 +1,6 @@
 package com.myProject.service;
 
+import com.myProject.dto.request.TransferRequest;
 import com.myProject.dto.response.AccountResponse;
 import com.myProject.dto.request.TransactionRequest;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,16 @@ public class DigitalBankingClientService {
         String token = getToken();
         restClient.post()
                 .uri("/transactions/deposit")
+                .header("Authorization", "Bearer " + token)
+                .body(request)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void transfer(TransferRequest request) {
+        String token = getToken();
+        restClient.post()
+                .uri("/transactions/transfer")
                 .header("Authorization", "Bearer " + token)
                 .body(request)
                 .retrieve()

@@ -42,6 +42,9 @@ public class User {
     @Column(nullable = false)
     private String address;
 
+    @Column(name = "account_number")
+    private String accountNumber;
+
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
