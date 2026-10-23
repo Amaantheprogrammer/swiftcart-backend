@@ -1,7 +1,6 @@
 package com.myProject.dto.request;
 
 import com.myProject.enums.OrderStatus;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 

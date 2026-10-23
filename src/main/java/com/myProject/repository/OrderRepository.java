@@ -1,7 +1,6 @@
 package com.myProject.repository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.*;

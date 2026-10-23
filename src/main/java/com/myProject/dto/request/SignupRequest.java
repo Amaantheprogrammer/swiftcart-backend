@@ -1,8 +1,6 @@
 package com.myProject.dto.request;
 
-import com.myProject.enums.PaymentMethod;
-
-import com.myProject.enums.Role;
+import com.myProject.enums.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
