@@ -17,7 +17,7 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("/my-cart")
+    @GetMapping("/me")
     public ResponseEntity<CartResponse> getMyCart() {
         return ResponseEntity.ok(cartService.getMyCart());
     }
