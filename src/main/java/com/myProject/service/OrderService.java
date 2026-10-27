@@ -166,15 +166,16 @@ public class OrderService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
-    public List<OrderResponse> placeOrderFromCart() {
-        User user = currentUserUtil.getCurrentUser();
-        Cart cart = user.getCart();
+    public List<OrderResponse> placeOrderFromCart(OrderFromCartRequest request) {
+        User customer = currentUserUtil.getCurrentUser();
+        Cart cart = customer.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new BadRequestException("Order cannot be placed with an empty cart");
         }
         List<CartItem> cartItems = cart.getCartItems();
-        PaymentMethod paymentMethod = user.getPaymentMethod();
+        PaymentMethod paymentMethod = customer.getPaymentMethod();
         BigDecimal totalAmount = BigDecimal.ZERO;
+        // Stock validation loop
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
             if (product.getStockQuantity() < cartItem.getQuantity()) {
@@ -184,46 +185,69 @@ public class OrderService {
                     product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))
             );
         }
+        String customerAccountNumber = null;
+        // Account number and balance check
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-            if (digitalBankingClientService.getMyAccounts().isEmpty()) {
-                throw new ResourceNotFoundException("No active bank account found for user");
+            if (customer.getAccountNumber() == null && request.getAccountNumber() == null) {
+                throw new BadRequestException("Transfer cannot proceed without account number");
             }
-            AccountResponse primaryAccount = digitalBankingClientService.getMyAccounts().getFirst();
-            if (primaryAccount.getBalance().compareTo(totalAmount) < 0) {
-                throw new InsufficientResourceException("Insufficient balance in account");
+            customerAccountNumber = request.getAccountNumber() != null
+                    ? request.getAccountNumber()
+                    : customer.getAccountNumber();
+            AccountResponse account = digitalBankingClientService.getAccountByNumber(customerAccountNumber);
+            if (account.getBalance().subtract(totalAmount).compareTo(BigDecimal.ZERO) < 0) {
+                throw new InsufficientResourceException("Insufficient balance in the account");
             }
-            TransactionRequest withdrawRequest = TransactionRequest.builder()
-                    .accountNumber(primaryAccount.getAccountNumber())
-                    .amount(totalAmount)
-                    .build();
-            digitalBankingClientService.withdraw(withdrawRequest);
         }
+        // seller -> item map
         Map<User, List<CartItem>> itemsBySeller = cartItems.stream()
                 .collect(Collectors.groupingBy(item -> item.getProduct().getUser()));
-
+        // seller account number -> price total
+        Map<String, BigDecimal> sellerPayoutMap = new HashMap<>();
+        for (Map.Entry<User, List<CartItem>> entry : itemsBySeller.entrySet()) {
+            User seller = entry.getKey();
+            if (seller.getAccountNumber() == null || seller.getAccountNumber().isBlank()) {
+                throw new ResourceNotFoundException("Seller " + seller.getName() + " does not have a linked bank account.");
+            }
+            BigDecimal sellerOrderTotal = entry.getValue().stream()
+                    .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            sellerPayoutMap.put(seller.getAccountNumber(), sellerOrderTotal);
+        }
+        if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
+            // Perform transfer to each seller account
+            for (Map.Entry<String, BigDecimal> payout : sellerPayoutMap.entrySet()) {
+                TransferRequest transferRequest = TransferRequest.builder()
+                        .customerAccountNumber(customerAccountNumber)
+                        .sellerAccountNumber(payout.getKey())
+                        .amount(payout.getValue())
+                        .build();
+                digitalBankingClientService.transfer(transferRequest);
+            }
+        }
         List<Order> savedOrders = new ArrayList<>();
-
         for (Map.Entry<User, List<CartItem>> entry : itemsBySeller.entrySet()) {
             User seller = entry.getKey();
             List<CartItem> sellerCartItems = entry.getValue();
-            BigDecimal sellerOrderTotal = sellerCartItems.stream()
-                    .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sellerOrderTotal = sellerPayoutMap.get(seller.getAccountNumber());
+
             Order order = Order.builder()
-                    .user(user)
+                    .user(customer)
                     .seller(seller)
-                    .address(user.getAddress())
-                    .paymentMethod(paymentMethod)
-                    .orderDate(LocalDateTime.now())
+                    .address(request.getAddress() != null ? request.getAddress() : customer.getAddress())
                     .totalAmount(sellerOrderTotal)
+                    .orderDate(LocalDateTime.now())
                     .orderStatus(OrderStatus.PENDING)
                     .paymentStatus(paymentMethod == PaymentMethod.BANK_TRANSFER ? PaymentStatus.PAID : PaymentStatus.PENDING)
+                    .paymentMethod(paymentMethod)
                     .orderItems(new ArrayList<>())
                     .build();
+            // Stock reduction
             for (CartItem cartItem : sellerCartItems) {
                 Product product = cartItem.getProduct();
                 product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
                 productRepository.save(product);
+
                 OrderItem orderItem = OrderItem.builder()
                         .order(order)
                         .product(product)
@@ -235,13 +259,16 @@ public class OrderService {
 
             savedOrders.add(orderRepository.save(order));
         }
+
         cart.getCartItems().clear();
         cartRepository.save(cart);
+
         return savedOrders.stream()
                 .map(order -> modelMapper.map(order, OrderResponse.class))
                 .collect(Collectors.toList());
     }
 
+    // To be updated
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {

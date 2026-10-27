@@ -2,6 +2,7 @@ package com.myProject.controller;
 
 import java.util.List;
 
+import com.myProject.dto.request.OrderFromCartRequest;
 import com.myProject.dto.request.OrderRequest;
 import com.myProject.dto.response.OrderResponse;
 import com.myProject.dto.request.OrderStatusUpdateRequest;
@@ -94,8 +95,8 @@ public class OrderController {
     @Operation(
             summary = "Place order from cart"
     )
-    public ResponseEntity<List<OrderResponse>> placeOrderFromCart() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrderFromCart());
+    public ResponseEntity<List<OrderResponse>> placeOrderFromCart(@Valid @RequestBody OrderFromCartRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrderFromCart(request));
     }
 
     @PatchMapping("/{orderId}/cancel")
