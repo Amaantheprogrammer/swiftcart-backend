@@ -18,15 +18,6 @@ public class DigitalBankingClientService {
 
     private final RestClient restClient;
 
-    public List<AccountResponse> getMyAccounts() {
-        String token = getToken();
-        return restClient.get()
-                .uri("accounts/my-accounts")
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<AccountResponse>>(){});
-    }
-
     public AccountResponse getAccountByNumber(String accountNumber) {
         String token = getToken();
         return restClient.get()
@@ -34,26 +25,6 @@ public class DigitalBankingClientService {
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .body(AccountResponse.class);
-    }
-
-    public void withdraw(TransactionRequest request) {
-        String token = getToken();
-        restClient.post()
-                .uri("/transactions/withdraw")
-                .header("Authorization", "Bearer " + token)
-                .body(request)
-                .retrieve()
-                .toBodilessEntity();
-    }
-
-    public void deposit(TransactionRequest request) {
-        String token = getToken();
-        restClient.post()
-                .uri("/transactions/deposit")
-                .header("Authorization", "Bearer " + token)
-                .body(request)
-                .retrieve()
-                .toBodilessEntity();
     }
 
     public void transfer(TransferRequest request) {
