@@ -272,35 +272,40 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {
-        User currentUser = currentUserUtil.getCurrentUser();
+        User customer = currentUserUtil.getCurrentUser();
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Order not found with ID: " + orderId));
 
-        if (!order.getUser().getId().equals(currentUser.getId())) {
+        if (!order.getUser().getId().equals(customer.getId())) {
             throw new AuthorizationDeniedException("You can only cancel your own orders");
         }
         if (order.getOrderStatus() == OrderStatus.DELIVERED
                 || order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new BadRequestException("Cannot cancel an order with order status: " + order.getOrderStatus());
         }
+        // Payment for BANK_TRANSFER
+        if (order.getPaymentStatus() == PaymentStatus.PAID && customer.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
+            String sellerAccountNumber = order.getSeller().getAccountNumber();
+            String customerAccountNumber = customer.getAccountNumber();
+            if (customerAccountNumber == null) {
+                throw new BadRequestException("Transfer cannot proceed without an account number");
+            }
+            if (sellerAccountNumber == null) {
+                throw new BadRequestException("Seller account number not found");
+            }
+            TransferRequest request = TransferRequest.builder()
+                    .customerAccountNumber(customerAccountNumber)
+                    .sellerAccountNumber(sellerAccountNumber)
+                    .amount(order.getTotalAmount())
+                    .build();
+            digitalBankingClientService.transfer(request);
+        }
+        // Stock refill
         order.getOrderItems().forEach(item -> {
             Product product = item.getProduct();
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
             productRepository.save(product);
         });
-        if (order.getPaymentStatus() == PaymentStatus.PAID && currentUser.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
-            List<AccountResponse> accounts = digitalBankingClientService.getMyAccounts();
-            if (accounts.isEmpty()) {
-                throw new ResourceNotFoundException("No active bank account found for user");
-            }
-            AccountResponse primaryAccount = accounts.getFirst();
-            TransactionRequest depositRequest = TransactionRequest.builder()
-                    .accountNumber(primaryAccount.getAccountNumber())
-                    .amount(order.getTotalAmount())
-                    .build();
-            digitalBankingClientService.deposit(depositRequest);
-        }
-
         order.setOrderStatus(OrderStatus.CANCELLED);
 
         order.setPaymentStatus(PaymentStatus.REFUNDED);
