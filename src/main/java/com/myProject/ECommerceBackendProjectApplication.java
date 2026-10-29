@@ -6,7 +6,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 @SpringBootApplication
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class ECommerceBackendProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ECommerceBackendProjectApplication.class, args);
