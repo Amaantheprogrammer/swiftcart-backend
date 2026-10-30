@@ -275,10 +275,11 @@ public class OrderService {
         User customer = currentUserUtil.getCurrentUser();
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Order not found with ID: " + orderId));
-
+        // Ownership check
         if (!order.getUser().getId().equals(customer.getId())) {
             throw new AuthorizationDeniedException("You can only cancel your own orders");
         }
+        // Edge case
         if (order.getOrderStatus() == OrderStatus.DELIVERED
                 || order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new BadRequestException("Cannot cancel an order with order status: " + order.getOrderStatus());
@@ -294,8 +295,8 @@ public class OrderService {
                 throw new BadRequestException("Seller account number not found");
             }
             TransferRequest request = TransferRequest.builder()
-                    .customerAccountNumber(customerAccountNumber)
-                    .sellerAccountNumber(sellerAccountNumber)
+                    .customerAccountNumber(sellerAccountNumber)
+                    .sellerAccountNumber(customerAccountNumber)
                     .amount(order.getTotalAmount())
                     .build();
             digitalBankingClientService.transfer(request);
