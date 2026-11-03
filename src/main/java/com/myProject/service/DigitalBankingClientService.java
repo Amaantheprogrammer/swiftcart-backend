@@ -2,15 +2,11 @@ package com.myProject.service;
 
 import com.myProject.dto.request.TransferRequest;
 import com.myProject.dto.response.AccountResponse;
-import com.myProject.dto.request.TransactionRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.context.request.*;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

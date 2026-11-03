@@ -2,7 +2,6 @@ package com.myProject.service;
 
 import com.myProject.entity.*;
 import com.myProject.exception.*;
-import com.myProject.entity.*;
 import com.myProject.repository.ProductRepository;
 import com.myProject.util.CurrentUserUtil;
 import com.myProject.dto.response.WishlistResponse;

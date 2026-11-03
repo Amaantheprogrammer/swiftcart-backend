@@ -1,7 +1,6 @@
 package com.myProject.filter;
 
 import org.springframework.context.annotation.*;
-import org.springframework.security.authentication.*;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,11 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.*;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.*;
 
 @Configuration
 @EnableWebSecurity
@@ -28,9 +24,9 @@ public class SecurityFilter {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer::disable)
-                .authorizeHttpRequests(auth -> 
+                .authorizeHttpRequests(auth ->
                     auth // Public Endpoints
-                        .requestMatchers("/", 
+                        .requestMatchers("/",
                                             "/auth/**",
                                             "/swagger-ui/**",
                                             "/v3/api-docs/**",
