@@ -1,42 +1,131 @@
 package com.myProject.service;
 
-import com.myProject.entity.User;
-import com.myProject.repository.UserRepository;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+import java.util.Optional;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+
+import com.myProject.dto.request.UpdateUserRequest;
+import com.myProject.dto.response.UserResponse;
+import com.myProject.entity.User;
+import com.myProject.enums.*;
+import com.myProject.repository.UserRepository;
+import com.myProject.util.CurrentUserUtil;
+
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-    @Autowired
+
+    @InjectMocks
+    private UserService userService;
+    @Mock
     private UserRepository userRepository;
+    @Mock
+    private CurrentUserUtil currentUserUtil;
+    @Mock
+    private ModelMapper modelMapper;
+    
+    @Test
+    void getUserByIdTest() {
+        // Mock user
+        User existingUser = User.builder()
+                .id(1L)
+                .name("Samuel Johnson")
+                .email("samuel.johnson@gmail.com")
+                .password("123456")
+                .role(Role.ROLE_USER)
+                .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+                .address("Toronto, 342 Doritos street")
+                .build();
+        // Expected response
+        UserResponse expectedUserResponse = UserResponse.builder()
+                .id(1L)
+                .name("Samuel Johnson")
+                .email("samuel.johnson@gmail.com")
+                .role(Role.ROLE_USER)
+                .build();
+        
+        when(modelMapper.map(any(User.class), eq(UserResponse.class))).thenReturn(expectedUserResponse);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "admin@ecommerce.com",
-            "josephstarc1@gmail.com"
-    })
-    void testFindByEmail(String email) {
-        assertTrue(userRepository.existsByEmail(email), "Failed for: " + email);
+        UserResponse actualUserResponse = userService.getUserById(1L);
+
+        // Assertions
+        assertNotNull(actualUserResponse);
+        assertEquals(expectedUserResponse.getName(), actualUserResponse.getName());
+        assertEquals(expectedUserResponse.getEmail(), actualUserResponse.getEmail());
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "2, 1, 1",
-            "5, 3, 2"
-    })
-    void testAddition(int expected, int a, int b) {
-        assertEquals(expected, a + b);
-    }
+    @Test
+    void getUserByEmailTest() {
+        // Mock user
+        User existingUser = User.builder()
+                .id(1L)
+                .name("Samuel Johnson")
+                .email("samuel.johnson@gmail.com")
+                .password("123456")
+                .role(Role.ROLE_USER)
+                .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+                .address("Toronto, 342 Doritos street")
+                .build();
+        // Expected response
+        UserResponse expectedUserResponse = UserResponse.builder()
+                .id(1L)
+                .name("Samuel Johnson")
+                .email("samuel.johnson@gmail.com")
+                .role(Role.ROLE_USER)
+                .build();
+        
+        when(modelMapper.map(any(User.class), eq(UserResponse.class))).thenReturn(expectedUserResponse);
+        when(userRepository.findByEmail("samuel.johnson@gmail.com")).thenReturn(Optional.of(existingUser));
 
-    @ParameterizedTest
-    @ArgumentsSource(UserArgumentProvider.class)
-    void testFindByEmail(User user) {
-        assertTrue(userRepository.existsByEmail(user.getEmail()), "Failed for: " + user.getEmail());
+        UserResponse actualUserResponse = userService.getUserByEmail("samuel.johnson@gmail.com");
+
+        // Assertions
+        assertNotNull(actualUserResponse);
+        assertEquals(expectedUserResponse.getName(), actualUserResponse.getName());
+        assertEquals(expectedUserResponse.getEmail(), actualUserResponse.getEmail());
+    }
+    
+    @Test
+    void updateMyUserTest() {
+        // Mock user and request
+        User existingUser = User.builder()
+                .id(1L)
+                .name("Samuel Johnson")
+                .email("samuel.johnson@gmail.com")
+                .password("123456")
+                .role(Role.ROLE_USER)
+                .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+                .address("Toronto, 342 Doritos street")
+                .build();
+        UpdateUserRequest request = new UpdateUserRequest(
+                "Sam Wilson",
+                "sam.wilson@gmail.com",
+                PaymentMethod.CASH_ON_DELIVERY
+        );
+        // Expected response
+        UserResponse expectedUserResponse = UserResponse.builder()
+                .id(1L)
+                .name("Sam Wilson")
+                .email("sam.wilson@gmail.com")
+                .role(Role.ROLE_USER)
+                .build();
+
+        when(modelMapper.map(any(User.class), eq(UserResponse.class))).thenReturn(expectedUserResponse);
+        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        when(currentUserUtil.getCurrentUser()).thenReturn(existingUser);
+
+        // Actual response
+        UserResponse actualUserResponse = userService.updateMyUser(request);
+
+        // Assertions
+        assertNotNull(actualUserResponse);
+        assertEquals(expectedUserResponse.getName(), actualUserResponse.getName());
     }
 }

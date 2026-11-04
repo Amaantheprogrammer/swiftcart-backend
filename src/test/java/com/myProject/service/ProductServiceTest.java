@@ -1,16 +1,10 @@
 package com.myProject.service;
 
-import com.myProject.entity.Category;
-import com.myProject.repository.CategoryRepository;
-import com.myProject.dto.request.NewProductRequest;
-import com.myProject.dto.response.ProductResponse;
-import com.myProject.dto.request.UpdateProductRequest;
-import com.myProject.entity.Product;
-import com.myProject.entity.ProductImage;
-import com.myProject.entity.User;
-import com.myProject.enums.PaymentMethod;
-import com.myProject.enums.Role;
-import com.myProject.repository.ProductRepository;
+import com.myProject.repository.*;
+import com.myProject.dto.request.*;
+import com.myProject.dto.response.*;
+import com.myProject.entity.*;
+import com.myProject.enums.*;
 import com.myProject.util.CurrentUserUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
