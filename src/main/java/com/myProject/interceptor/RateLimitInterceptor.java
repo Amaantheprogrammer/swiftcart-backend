@@ -54,7 +54,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             if (user != null && user.getId() != null) {
                 return "rate_limit:user_" + user.getId();
             }
-            throw new IllegalStateException("");
+            throw new IllegalStateException("Authenticated user could not be resolved for rate limiting.");
         }
         return "rate_limit:ip_" + getClientIp(request);
     }
