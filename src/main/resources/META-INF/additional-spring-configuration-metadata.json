@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.secret'"
+  },
+  {
+    "name": "jwt.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.expiration'"
+  },
+  {
+    "name": "jwt.refresh-expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.refresh-expiration'"
+  },
+  {
+    "name": "admin.name",
+    "type": "java.lang.String",
+    "description": "A description for 'admin.name'"
+  },
+  {
+    "name": "admin.email",
+    "type": "java.lang.String",
+    "description": "A description for 'admin.email'"
+  },
+  {
+    "name": "admin.password",
+    "type": "java.lang.String",
+    "description": "A description for 'admin.password'"
+  }
+]}

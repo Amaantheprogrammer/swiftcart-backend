@@ -11,21 +11,21 @@ import com.myProject.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
-@Component 
-@RequiredArgsConstructor 
+@Component
+@RequiredArgsConstructor
 public class SeedAdmin {
 
-    @Value("${admin.name:Amaan}")
+    @Value("${admin.name}")
     private String adminName;
-    @Value("${admin.email:admin@ecommerce.com}")
+    @Value("${admin.email}")
     private String adminEmail;
-    @Value("${admin.password:admin123}")
+    @Value("${admin.password}")
     private String adminPassword;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @PostConstruct 
+    @PostConstruct
     public void seedAdmin() {
         if (!userRepository.existsByEmail(adminEmail)) {
             User user = User.builder()
