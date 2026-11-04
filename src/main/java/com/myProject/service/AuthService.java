@@ -51,7 +51,7 @@ public class AuthService {
 
         addRefreshTokenCookie(response, refreshToken);
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(accessToken);
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class AuthService {
 
         addRefreshTokenCookie(response, newRefreshToken);
 
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return new AuthResponse(newAccessToken);
     }
 
     // Private methods

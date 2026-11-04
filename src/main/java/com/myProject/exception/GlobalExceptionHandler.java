@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import com.myProject.dto.response.ErrorResponse;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -73,7 +77,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         @SuppressWarnings("CallToPrintStackTrace")
         public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-                ex.printStackTrace();
+                log.error("Unexpected application error ", ex);
                 ErrorResponse error = ErrorResponse.builder()
                         .message(ex.getMessage())
                         .timestamp(LocalDateTime.now())

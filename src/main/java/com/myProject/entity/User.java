@@ -2,15 +2,19 @@ package com.myProject.entity;
 
 import java.util.*;
 
-import com.myProject.enums.PaymentMethod;
-import com.myProject.enums.Role;
+import com.myProject.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter 
-@Table(name = "users")
+@Setter
+@Table(
+    name = "users",
+    indexes = {
+        @Index(name = "idx_user_email", columnList = "email")
+    }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder // Enables creating readable way to create objects
