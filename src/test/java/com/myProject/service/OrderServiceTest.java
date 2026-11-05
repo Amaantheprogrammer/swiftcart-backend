@@ -1,0 +1,215 @@
+package com.myProject.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+
+import com.myProject.dto.response.*;
+import com.myProject.entity.*;
+import com.myProject.enums.*;
+import com.myProject.repository.OrderRepository;
+
+@ExtendWith(MockitoExtension.class)
+public class OrderServiceTest {
+    @InjectMocks
+    private OrderService orderService;
+    @Mock
+    private OrderRepository orderRepository;
+    @Mock
+    private ModelMapper modelMapper;
+    
+    private User seller;
+    private User customer;
+    private Product product;
+    private ProductImage image;
+    private Category category;
+    
+    @BeforeEach
+    void setUp() {
+        seller = User.builder()
+        .id(1L)
+        .name("Jeff Bezos")
+        .email("jeff.bezos@gmail.com")
+        .address("White tower US East-1")
+        .password("jeff123")
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .role(Role.ROLE_SELLER)
+        .accountNumber("ACC123")
+        .products(new ArrayList<>())
+        .build();
+
+        customer = User.builder()
+        .id(2L)
+        .name("Mike Grayson")
+        .email("mike.grayson@gmail.com")
+        .address("City tower US West-2")
+        .password("mike123")
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .role(Role.ROLE_USER)
+        .accountNumber("ACC456")
+        .build();
+
+        category = Category.builder()
+        .id(1L)
+        .name("Household products")
+        .products(new ArrayList<>())
+        .build();
+
+        product = Product.builder()
+        .id(1L)
+        .name("Comfortable Sofa")
+        .category(null)
+        .description("L-shaped comfortable red color sofa for 4 people")
+        .createdAt(LocalDateTime.now())
+        .price(new BigDecimal("15000"))
+        .stockQuantity(10)
+        .approved(true)
+        .user(seller)
+        .category(null)
+        .build();
+
+        image = ProductImage.builder()
+        .id(1L)
+        .imageUrl("Image url")
+        .product(product)
+        .build();
+
+        product.getProductImages().add(image);
+        seller.getProducts().add(product);
+        category.getProducts().add(product);
+    }
+    
+    @Test
+    void getOrderByIdTest() {
+        // Mock data
+        OrderItem item = OrderItem.builder()
+            .id(1L)
+            .priceAtPurchase(product.getPrice())
+            .quantity(1)
+            .product(product)
+            .build();
+
+        Order order = Order.builder()
+            .id(1L)
+            .orderDate(LocalDateTime.now())
+            .orderStatus(OrderStatus.PENDING)
+            .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+            .seller(seller)
+            .user(customer)
+            .totalAmount(product.getPrice())
+            .paymentStatus(PaymentStatus.PENDING)
+            .orderItems(new ArrayList<>())
+            .build();
+
+        item.setOrder(order);
+        order.getOrderItems().add(item);
+
+        // Expected response
+        OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
+        .id(1L)
+        .orderId(1L)
+        .productId(1L)
+        .priceAtPurchase(new BigDecimal("15000"))
+        .quantity(1)
+        .build();
+
+        OrderResponse expectedOrderResponse = OrderResponse.builder()
+        .id(1L)
+        .orderDate(LocalDateTime.now())
+        .orderStatus(OrderStatus.PENDING)
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .paymentStatus(PaymentStatus.PENDING)
+        .totalAmount(new BigDecimal("15000"))
+        .userId(2L)
+        .userName("Mike Grayson")
+        .orderItems(new ArrayList<>())
+        .build();
+        
+        expectedOrderResponse.getOrderItems().add(expectedItemResponse);
+        
+        // Stub data
+        when(modelMapper.map(any(Order.class), eq(OrderResponse.class))).thenReturn(expectedOrderResponse);
+        when(orderRepository.findOrderById(1L)).thenReturn(Optional.of(order));
+
+        OrderResponse actualOrderResponse = orderService.getOrderById(1L);
+
+        // Assertions
+        assertNotNull(actualOrderResponse);
+        assertEquals(expectedOrderResponse.getId(), actualOrderResponse.getId());
+        assertEquals(expectedOrderResponse.getTotalAmount(), actualOrderResponse.getTotalAmount());
+        assertEquals(expectedOrderResponse.getUserName(), actualOrderResponse.getUserName());
+        assertEquals(1, actualOrderResponse.getOrderItems().size());
+    }
+    
+    @Test
+    void getOrderByUserId() {
+        // Mock data
+        OrderItem item = OrderItem.builder()
+            .id(1L)
+            .priceAtPurchase(product.getPrice())
+            .quantity(1)
+            .product(product)
+            .build();
+
+        Order order = Order.builder()
+            .id(1L)
+            .orderDate(LocalDateTime.now())
+            .orderStatus(OrderStatus.PENDING)
+            .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+            .seller(seller)
+            .user(customer)
+            .totalAmount(product.getPrice())
+            .paymentStatus(PaymentStatus.PENDING)
+            .orderItems(new ArrayList<>())
+            .build();
+
+        item.setOrder(order);
+        order.getOrderItems().add(item);
+        
+        // Expected response
+        OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
+        .id(1L)
+        .orderId(1L)
+        .productId(1L)
+        .priceAtPurchase(new BigDecimal("15000"))
+        .quantity(1)
+        .build();
+
+        OrderResponse expectedOrderResponse = OrderResponse.builder()
+        .id(1L)
+        .orderDate(LocalDateTime.now())
+        .orderStatus(OrderStatus.PENDING)
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .paymentStatus(PaymentStatus.PENDING)
+        .totalAmount(new BigDecimal("15000"))
+        .userId(2L)
+        .userName("Mike Grayson")
+        .orderItems(new ArrayList<>())
+        .build();
+        
+        expectedOrderResponse.getOrderItems().add(expectedItemResponse);
+
+        List<OrderResponse> expectedOrderResponses = Arrays.asList(expectedOrderResponse);
+
+        // Stub data
+        when(modelMapper.map(any(Order.class), eq(OrderResponse.class))).thenReturn(expectedOrderResponse);
+        when(orderRepository.findByUserId(2L)).thenReturn(Arrays.asList(order));
+    
+        List<OrderResponse> actualOrderResponses = orderService.getOrderByUserId(2L);
+
+        assertNotNull(actualOrderResponses);
+        assertEquals(expectedOrderResponses.get(0).getId(), actualOrderResponses.get(0).getId());
+        assertEquals(expectedOrderResponses.get(0).getUserId(), actualOrderResponses.get(0).getUserId());
+    }
+}
