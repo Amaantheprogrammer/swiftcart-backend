@@ -268,7 +268,6 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // To be updated
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {

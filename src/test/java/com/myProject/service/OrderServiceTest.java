@@ -15,10 +15,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import com.myProject.dto.request.OrderStatusUpdateRequest;
 import com.myProject.dto.response.*;
 import com.myProject.entity.*;
 import com.myProject.enums.*;
 import com.myProject.repository.OrderRepository;
+import com.myProject.util.CurrentUserUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -28,12 +30,16 @@ public class OrderServiceTest {
     private OrderRepository orderRepository;
     @Mock
     private ModelMapper modelMapper;
+    @Mock
+    private CurrentUserUtil currentUserUtil;
     
     private User seller;
     private User customer;
     private Product product;
     private ProductImage image;
     private Category category;
+    private OrderItem item;
+    private Order order;
     
     @BeforeEach
     void setUp() {
@@ -88,19 +94,15 @@ public class OrderServiceTest {
         product.getProductImages().add(image);
         seller.getProducts().add(product);
         category.getProducts().add(product);
-    }
-    
-    @Test
-    void getOrderByIdTest() {
-        // Mock data
-        OrderItem item = OrderItem.builder()
+
+        item = OrderItem.builder()
             .id(1L)
             .priceAtPurchase(product.getPrice())
             .quantity(1)
             .product(product)
             .build();
 
-        Order order = Order.builder()
+        order = Order.builder()
             .id(1L)
             .orderDate(LocalDateTime.now())
             .orderStatus(OrderStatus.PENDING)
@@ -111,10 +113,10 @@ public class OrderServiceTest {
             .paymentStatus(PaymentStatus.PENDING)
             .orderItems(new ArrayList<>())
             .build();
-
-        item.setOrder(order);
-        order.getOrderItems().add(item);
-
+    }
+    
+    @Test
+    void getOrderByIdTest() {
         // Expected response
         OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
         .id(1L)
@@ -154,29 +156,6 @@ public class OrderServiceTest {
     
     @Test
     void getOrderByUserId() {
-        // Mock data
-        OrderItem item = OrderItem.builder()
-            .id(1L)
-            .priceAtPurchase(product.getPrice())
-            .quantity(1)
-            .product(product)
-            .build();
-
-        Order order = Order.builder()
-            .id(1L)
-            .orderDate(LocalDateTime.now())
-            .orderStatus(OrderStatus.PENDING)
-            .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
-            .seller(seller)
-            .user(customer)
-            .totalAmount(product.getPrice())
-            .paymentStatus(PaymentStatus.PENDING)
-            .orderItems(new ArrayList<>())
-            .build();
-
-        item.setOrder(order);
-        order.getOrderItems().add(item);
-        
         // Expected response
         OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
         .id(1L)
@@ -211,5 +190,49 @@ public class OrderServiceTest {
         assertNotNull(actualOrderResponses);
         assertEquals(expectedOrderResponses.get(0).getId(), actualOrderResponses.get(0).getId());
         assertEquals(expectedOrderResponses.get(0).getUserId(), actualOrderResponses.get(0).getUserId());
+        assertEquals(expectedOrderResponses.get(0).getOrderDate(), actualOrderResponses.get(0).getOrderDate());
+    }
+    
+    @Test
+    void updateOrderStatusTest() {
+        OrderStatusUpdateRequest request = new OrderStatusUpdateRequest(OrderStatus.SHIPPED);
+        Long orderId = order.getId();
+        Long sellerId = seller.getId();
+        Long customerId = customer.getId();
+
+        // Expected response
+        OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
+        .id(item.getId())
+        .productId(product.getId())
+        .quantity(1)
+        .priceAtPurchase(product.getPrice())
+        .orderId(orderId)
+        .build();
+        OrderResponse expectedOrderResponse = OrderResponse.builder()
+        .id(orderId)
+        .orderDate(LocalDateTime.now())
+        .orderItems(new ArrayList<>())
+        .orderStatus(OrderStatus.SHIPPED)
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .paymentStatus(PaymentStatus.PENDING)
+        .totalAmount(order.getTotalAmount())
+        .userId(customerId)
+        .userName(customer.getName())
+        .build();
+
+        expectedOrderResponse.getOrderItems().add(expectedItemResponse);
+        
+        // Stub
+        when(currentUserUtil.getCurrentUser()).thenReturn(seller);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(modelMapper.map(any(Order.class), eq(OrderResponse.class))).thenReturn(expectedOrderResponse);
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
+
+        // Actual Response
+        OrderResponse actualOrderResponse = orderService.updateOrderStatus(orderId, request);
+
+        // Assertions
+        assertNotNull(actualOrderResponse);
+        assertEquals(expectedOrderResponse, actualOrderResponse);
     }
 }
