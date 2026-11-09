@@ -12,5 +12,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = {"cart", "wishlist"})
     Optional<User> findByEmail(String email);
     
+    @EntityGraph(attributePaths = {"cart", "wishlist"})
+    Optional<User> findByEmailContainingIgnoreCase(String email);
+    
     boolean existsByEmail(String email);
 }

@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor // Objects with "final" keyword get added to the constructor
-@RequestMapping("/users") // Reduces the effort of writing "/users" again and again
+@RequiredArgsConstructor
+@RequestMapping("/users")
 @Tag(name = "Users", description = "User APIs")
 public class UserController {
 
@@ -25,10 +25,9 @@ public class UserController {
         description = "Get all users if email is not passed, otherwise get specific user by email"
     )
     public ResponseEntity<?> getUsers(@RequestParam(required = false) String email) {
-        if (email != null && !email.isBlank()) {
-            return ResponseEntity.ok(userService.getUserByEmail(email));
-        }
-        return ResponseEntity.ok(userService.getAllUsers());
+        return (email != null && !email.isBlank()) ?
+                ResponseEntity.ok(userService.getUserByEmail(email)) :
+                ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")

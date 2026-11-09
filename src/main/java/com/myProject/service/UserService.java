@@ -50,8 +50,8 @@ public class UserService {
     @Transactional(readOnly = true)
     @Cacheable(value = "usersByEmail", key = "#email")
     public UserResponse getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        User user = userRepository.findByEmailContainingIgnoreCase(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return modelMapper.map(user, UserResponse.class);
     }
 
