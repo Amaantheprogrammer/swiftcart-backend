@@ -36,6 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.category.id = :id AND p.price < :price")
     List<Product> findByCategoryIdAndPriceLessThan(@Param("id") Long id, @Param("price") BigDecimal price);
     
+    @EntityGraph(attributePaths = {"category", "productImages", "user"})
     @Query("SELECT p FROM Product p WHERE p.id IN :ids AND p.approved")
     List<Product> findByIdInAndApproved(List<Long> ids);
     
