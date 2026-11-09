@@ -17,9 +17,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@RestController // REST API usage
-@RequiredArgsConstructor // Objects with "final" keyword get added to the constructor
-@RequestMapping("/products") // Adds "products" to every http link
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/products")
 @Tag(name = "Products", description = "Product APIs")
 public class ProductController {
     
@@ -88,6 +88,14 @@ public class ProductController {
     )
     public ResponseEntity<List<ProductResponse>> getProductsByCategoryId(@PathVariable Long id, @RequestParam(required = false) BigDecimal price) {
         return ResponseEntity.ok(productService.getProductsByCategoryIdAndPriceLessThan(id, price));
+    }
+    
+    @PostMapping("/batch")
+    @Operation(
+        summary = "Get batched products"
+    )
+    public ResponseEntity<List<ProductResponse>> getProductsBatch(@RequestBody ProductBatchRequest request) {
+        return ResponseEntity.ok(productService.getProductsBatch(request));
     }
 
     @PostMapping

@@ -93,6 +93,21 @@ public class ProductService {
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
     }
+    
+    @Transactional(readOnly = true)
+    @Cacheable(
+        value = "productBatches",
+        key = "T5(java.util.Collections).sort(#request.productIds) ? #request.productIds : #request.productIds"
+    )
+    public List<ProductResponse> getProductsBatch(ProductBatchRequest request) {
+        if (request.getProductIds() == null || request.getProductIds().isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Product> products = productRepository.findByIdInAndApproved(request.getProductIds());
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
