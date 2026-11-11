@@ -84,7 +84,7 @@ public class CartService {
         User user = currentUserUtil.getCurrentUser();
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
-        }     
+        }
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty or does not exist for user ID: " + user.getId());

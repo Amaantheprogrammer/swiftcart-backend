@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Setter 
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -17,7 +17,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
