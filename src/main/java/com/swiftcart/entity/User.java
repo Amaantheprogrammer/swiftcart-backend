@@ -2,9 +2,7 @@ package com.swiftcart.entity;
 
 import java.util.*;
 
-import com.myProject.enums.*;
-import com.swiftcart.enums.PaymentMethod;
-import com.swiftcart.enums.Role;
+import com.swiftcart.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 

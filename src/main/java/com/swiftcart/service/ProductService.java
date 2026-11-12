@@ -4,22 +4,11 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.myProject.dto.request.*;
-import com.myProject.entity.*;
-import com.myProject.dto.response.*;
-import com.swiftcart.dto.request.ImageRequest;
-import com.swiftcart.dto.request.NewProductRequest;
-import com.swiftcart.dto.request.ProductBatchRequest;
-import com.swiftcart.dto.request.UpdateProductRequest;
+import com.swiftcart.dto.request.*;
 import com.swiftcart.dto.response.ProductResponse;
-import com.swiftcart.entity.Category;
-import com.swiftcart.entity.Product;
-import com.swiftcart.entity.ProductImage;
-import com.swiftcart.entity.User;
-import com.swiftcart.exception.DuplicateResourceException;
-import com.swiftcart.exception.ResourceNotFoundException;
-import com.swiftcart.repository.CategoryRepository;
-import com.swiftcart.repository.ProductRepository;
+import com.swiftcart.entity.*;
+import com.swiftcart.exception.*;
+import com.swiftcart.repository.*;
 import com.swiftcart.util.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.*;
@@ -28,9 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.myProject.repository.*;
-import com.myProject.exception.*;
 
 import lombok.RequiredArgsConstructor;
 

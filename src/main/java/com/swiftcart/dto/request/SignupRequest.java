@@ -1,8 +1,6 @@
 package com.swiftcart.dto.request;
 
-import com.myProject.enums.*;
-import com.swiftcart.enums.PaymentMethod;
-import com.swiftcart.enums.Role;
+import com.swiftcart.enums.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

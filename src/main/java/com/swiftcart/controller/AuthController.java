@@ -1,9 +1,7 @@
 package com.swiftcart.controller;
 
-import com.swiftcart.dto.request.SignInRequest;
-import com.swiftcart.dto.request.SignupRequest;
+import com.swiftcart.dto.request.*;
 import com.swiftcart.dto.response.AuthResponse;
-import com.myProject.dto.request.*;
 import com.swiftcart.service.AuthService;
 import jakarta.servlet.http.*;
 import jakarta.validation.Valid;

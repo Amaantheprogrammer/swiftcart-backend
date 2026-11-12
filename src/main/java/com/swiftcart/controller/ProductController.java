@@ -3,12 +3,7 @@ package com.swiftcart.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.myProject.dto.request.*;
-import com.myProject.dto.response.*;
-import com.swiftcart.dto.request.ImageRequest;
-import com.swiftcart.dto.request.NewProductRequest;
-import com.swiftcart.dto.request.ProductBatchRequest;
-import com.swiftcart.dto.request.UpdateProductRequest;
+import com.swiftcart.dto.request.*;
 import com.swiftcart.dto.response.ProductResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.*;

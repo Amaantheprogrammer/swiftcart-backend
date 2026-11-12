@@ -2,16 +2,9 @@ package com.swiftcart.service;
 
 import java.util.Optional;
 
-import com.myProject.entity.*;
-import com.swiftcart.entity.Cart;
-import com.swiftcart.entity.CartItem;
-import com.swiftcart.entity.Product;
-import com.swiftcart.entity.User;
-import com.swiftcart.exception.BadRequestException;
-import com.swiftcart.exception.InsufficientResourceException;
-import com.swiftcart.exception.ResourceNotFoundException;
-import com.swiftcart.repository.CartRepository;
-import com.swiftcart.repository.ProductRepository;
+import com.swiftcart.entity.*;
+import com.swiftcart.exception.*;
+import com.swiftcart.repository.*;
 import com.swiftcart.util.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.dto.response.CartResponse;
-import com.myProject.repository.*;
-import com.myProject.exception.*;
 
 import lombok.RequiredArgsConstructor;
 

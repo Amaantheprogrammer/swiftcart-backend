@@ -5,9 +5,7 @@ import java.util.stream.Collectors;
 
 import com.swiftcart.dto.request.CategoryRequest;
 import com.swiftcart.dto.response.CategoryResponse;
-import com.myProject.exception.*;
-import com.swiftcart.exception.DuplicateResourceException;
-import com.swiftcart.exception.ResourceNotFoundException;
+import com.swiftcart.exception.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;

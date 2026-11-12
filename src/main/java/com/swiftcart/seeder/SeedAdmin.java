@@ -1,9 +1,7 @@
 package com.swiftcart.seeder;
 
 import com.swiftcart.entity.User;
-import com.myProject.enums.*;
-import com.swiftcart.enums.PaymentMethod;
-import com.swiftcart.enums.Role;
+import com.swiftcart.enums.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

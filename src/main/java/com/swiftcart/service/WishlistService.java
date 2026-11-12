@@ -1,13 +1,7 @@
 package com.swiftcart.service;
 
-import com.myProject.entity.*;
-import com.myProject.exception.*;
-import com.swiftcart.entity.Product;
-import com.swiftcart.entity.User;
-import com.swiftcart.entity.Wishlist;
-import com.swiftcart.entity.WishlistItem;
-import com.swiftcart.exception.DuplicateResourceException;
-import com.swiftcart.exception.ResourceNotFoundException;
+import com.swiftcart.entity.*;
+import com.swiftcart.exception.*;
 import com.swiftcart.repository.ProductRepository;
 import com.swiftcart.util.CurrentUserUtil;
 import com.swiftcart.dto.response.WishlistResponse;
