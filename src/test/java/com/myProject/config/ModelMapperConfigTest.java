@@ -1,8 +1,9 @@
 package com.myProject.config;
 
-import com.myProject.dto.response.ProductResponse;
-import com.myProject.entity.Product;
-import com.myProject.entity.User;
+import com.swiftcart.config.ModelMapperConfig;
+import com.swiftcart.dto.response.ProductResponse;
+import com.swiftcart.entity.Product;
+import com.swiftcart.entity.User;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 

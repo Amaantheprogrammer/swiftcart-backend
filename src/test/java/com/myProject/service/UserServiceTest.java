@@ -5,18 +5,21 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+
+import com.swiftcart.enums.PaymentMethod;
+import com.swiftcart.enums.Role;
+import com.swiftcart.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import com.myProject.dto.request.UpdateUserRequest;
-import com.myProject.dto.response.UserResponse;
-import com.myProject.entity.User;
-import com.myProject.enums.*;
-import com.myProject.repository.UserRepository;
-import com.myProject.util.CurrentUserUtil;
+import com.swiftcart.dto.request.UpdateUserRequest;
+import com.swiftcart.dto.response.UserResponse;
+import com.swiftcart.entity.User;
+import com.swiftcart.repository.UserRepository;
+import com.swiftcart.util.CurrentUserUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

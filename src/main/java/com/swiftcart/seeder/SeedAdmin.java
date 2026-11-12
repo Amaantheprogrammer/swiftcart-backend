@@ -1,0 +1,43 @@
+package com.swiftcart.seeder;
+
+import com.swiftcart.entity.User;
+import com.myProject.enums.*;
+import com.swiftcart.enums.PaymentMethod;
+import com.swiftcart.enums.Role;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import com.swiftcart.repository.UserRepository;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class SeedAdmin {
+
+    @Value("${admin.name:Amaan}")
+    private String adminName;
+    @Value("${admin.email:admin@ecommerce.com}")
+    private String adminEmail;
+    @Value("${admin.password:admin123}")
+    private String adminPassword;
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    public void seedAdmin() {
+        if (!userRepository.existsByEmail(adminEmail)) {
+            User user = User.builder()
+            .name(adminName)
+            .email(adminEmail)
+            .password(passwordEncoder.encode(adminPassword))
+            .role(Role.ROLE_ADMIN)
+            .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+            .build();
+            userRepository.save(user);
+        }
+    }
+}

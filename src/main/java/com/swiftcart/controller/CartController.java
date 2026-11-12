@@ -1,0 +1,40 @@
+package com.swiftcart.controller;
+
+import com.swiftcart.dto.response.CartResponse;
+import com.swiftcart.dto.request.UpdateCartRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.swiftcart.service.CartService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/carts")
+public class CartController {
+
+    private final CartService cartService;
+
+    @GetMapping("/me")
+    public ResponseEntity<CartResponse> getMyCart() {
+        return ResponseEntity.ok(cartService.getMyCart());
+    }
+    
+    @PostMapping("/items")
+    public ResponseEntity<CartResponse> updateItemQuantity(@Valid @RequestBody UpdateCartRequest request) {
+        return ResponseEntity.ok(cartService.updateItemQuantity(request.getProductId(), request.getQuantity()));
+    }
+
+    @DeleteMapping("/items/{productId}")
+    public ResponseEntity<CartResponse> removeProductFromCart(@PathVariable Long productId) {
+        return ResponseEntity.ok(cartService.removeProductFromCart(productId));
+    }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearCart() {
+        cartService.clearCart();
+        return ResponseEntity.noContent().build();
+    }
+}

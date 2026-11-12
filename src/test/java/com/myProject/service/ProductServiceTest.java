@@ -1,11 +1,18 @@
 package com.myProject.service;
 
-import com.myProject.repository.*;
-import com.myProject.dto.request.*;
-import com.myProject.dto.response.*;
-import com.myProject.entity.*;
-import com.myProject.enums.*;
-import com.myProject.util.CurrentUserUtil;
+import com.swiftcart.dto.request.NewProductRequest;
+import com.swiftcart.dto.request.UpdateProductRequest;
+import com.swiftcart.dto.response.ProductResponse;
+import com.swiftcart.entity.Category;
+import com.swiftcart.entity.Product;
+import com.swiftcart.entity.ProductImage;
+import com.swiftcart.entity.User;
+import com.swiftcart.enums.PaymentMethod;
+import com.swiftcart.enums.Role;
+import com.swiftcart.repository.CategoryRepository;
+import com.swiftcart.repository.ProductRepository;
+import com.swiftcart.service.ProductService;
+import com.swiftcart.util.CurrentUserUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;

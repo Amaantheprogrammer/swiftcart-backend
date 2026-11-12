@@ -8,6 +8,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.swiftcart.dto.response.OrderItemResponse;
+import com.swiftcart.dto.response.OrderResponse;
+import com.swiftcart.entity.*;
+import com.swiftcart.enums.OrderStatus;
+import com.swiftcart.enums.PaymentMethod;
+import com.swiftcart.enums.PaymentStatus;
+import com.swiftcart.enums.Role;
+import com.swiftcart.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +23,9 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import com.myProject.dto.request.OrderStatusUpdateRequest;
-import com.myProject.dto.response.*;
-import com.myProject.entity.*;
-import com.myProject.enums.*;
-import com.myProject.repository.OrderRepository;
-import com.myProject.util.CurrentUserUtil;
+import com.swiftcart.dto.request.OrderStatusUpdateRequest;
+import com.swiftcart.repository.OrderRepository;
+import com.swiftcart.util.CurrentUserUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
