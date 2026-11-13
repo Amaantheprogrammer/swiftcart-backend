@@ -126,6 +126,7 @@ GET    /products/me                          -> Fetch products listed by current
 GET    /products/search?name={}&price={}     -> Search by name with optional max price
 GET    /products/category/{id}?price={}      -> Category browse with price filters
 POST   /products                             -> Create product (ROLE_SELLER)
+POST   /products/batch                       -> Batch endpoint
 PATCH  /products/{id}                        -> Update product details (Product owner only)
 POST   /products/{id}/image                  -> Upload product image (ROLE_SELLER)
 PUT    /products/{id}/image/{imageId}        -> Replace product image
