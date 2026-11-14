@@ -94,10 +94,10 @@ public class ProductService {
     }
     
     @Transactional(readOnly = true)
-    @Cacheable(
-        value = "productBatches",
-        key = "T5(java.util.Collections).sort(#request.productIds) ? #request.productIds : #request.productIds"
-    )
+    // @Cacheable(
+    //     value = "productBatches",
+    //     key = "T5(java.util.Collections).sort(#request.productIds) ? #request.productIds : #request.productIds"
+    // )
     public List<ProductResponse> getProductsBatch(ProductBatchRequest request) {
         if (request.getProductIds() == null || request.getProductIds().isEmpty()) {
             return new ArrayList<>();
