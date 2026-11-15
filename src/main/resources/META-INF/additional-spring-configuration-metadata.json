@@ -28,5 +28,15 @@
     "name": "admin.password",
     "type": "java.lang.String",
     "description": "A description for 'admin.password'"
+  },
+  {
+    "name": "rate-limiter.token-capacity",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limiter.token-capacity'"
+  },
+  {
+    "name": "rate-limiter.duration",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limiter.duration'"
   }
 ]}

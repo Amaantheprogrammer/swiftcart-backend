@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.swiftcart.entity.Category;
 import com.swiftcart.repository.CategoryRepository;
@@ -20,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@RequestMapping("categories")
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
