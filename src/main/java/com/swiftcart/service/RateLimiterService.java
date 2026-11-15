@@ -13,9 +13,9 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class RateLimiterService {
     
-    @Value("${rate-limiter.token-capacity}")
+    @Value("${rate-limiter.token-capacity:20}")
     private int tokenCapacity;
-    @Value("${rate-limiter.duration}")
+    @Value("${rate-limiter.duration:60}")
     private int durationSeconds;
 
     private final ProxyManager<String> proxyManager;
