@@ -11,10 +11,7 @@ import java.util.*;
 import com.swiftcart.dto.response.OrderItemResponse;
 import com.swiftcart.dto.response.OrderResponse;
 import com.swiftcart.entity.*;
-import com.swiftcart.enums.OrderStatus;
-import com.swiftcart.enums.PaymentMethod;
-import com.swiftcart.enums.PaymentStatus;
-import com.swiftcart.enums.Role;
+import com.swiftcart.enums.*;
 import com.swiftcart.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import com.swiftcart.dto.request.OrderStatusUpdateRequest;
+import com.swiftcart.dto.request.PaymentStatusUpdateRequest;
 import com.swiftcart.repository.OrderRepository;
 import com.swiftcart.util.CurrentUserUtil;
 
@@ -239,5 +237,49 @@ public class OrderServiceTest {
         // Assertions
         assertNotNull(actualOrderResponse);
         assertEquals(expectedOrderResponse, actualOrderResponse);
+    }
+    
+    @Test
+    void updatePaymentStatusTest() {
+        PaymentStatusUpdateRequest request = new PaymentStatusUpdateRequest(PaymentStatus.PAID);
+        Long orderId = order.getId();
+        Long sellerId = seller.getId();
+        Long customerId = customer.getId();
+
+        // Expected response
+        OrderItemResponse expectedItemResponse = OrderItemResponse.builder()
+        .id(item.getId())
+        .productId(product.getId())
+        .quantity(1)
+        .priceAtPurchase(product.getPrice())
+        .orderId(orderId)
+        .build();
+        OrderResponse expectedOrderResponse = OrderResponse.builder()
+        .id(orderId)
+        .orderDate(LocalDateTime.now())
+        .orderItems(new ArrayList<>())
+        .orderStatus(OrderStatus.DELIVERED)
+        .paymentMethod(PaymentMethod.CASH_ON_DELIVERY)
+        .paymentStatus(PaymentStatus.PAID)
+        .totalAmount(order.getTotalAmount())
+        .userId(customerId)
+        .userName(customer.getName())
+        .build();
+
+        expectedOrderResponse.getOrderItems().add(expectedItemResponse);
+
+         // Stub
+        when(currentUserUtil.getCurrentUser()).thenReturn(seller);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(modelMapper.map(any(Order.class), eq(OrderResponse.class))).thenReturn(expectedOrderResponse);
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
+    
+         // Actual Response
+        OrderResponse actualOrderResponse = orderService.updatePaymentStatus(orderId, request);
+
+        // Assertions
+        assertNotNull(actualOrderResponse);
+        assertEquals(expectedOrderResponse, actualOrderResponse);
+
     }
 }
