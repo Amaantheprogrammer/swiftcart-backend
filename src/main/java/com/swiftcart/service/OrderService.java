@@ -286,11 +286,8 @@ public class OrderService {
         if (order.getPaymentStatus() == PaymentStatus.PAID && customer.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
             String sellerAccountNumber = order.getSeller().getAccountNumber();
             String customerAccountNumber = customer.getAccountNumber();
-            if (customerAccountNumber == null) {
+            if (customerAccountNumber == null || sellerAccountNumber == null) {
                 throw new BadRequestException("Transfer cannot proceed without an account number");
-            }
-            if (sellerAccountNumber == null) {
-                throw new BadRequestException("Seller account number not found");
             }
             TransferRequest request = TransferRequest.builder()
                     .customerAccountNumber(sellerAccountNumber)
