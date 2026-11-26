@@ -26,8 +26,9 @@ public class OrderEmailDetailsService {
             orderId,
             customer.getName(),
             customer.getEmail(),
-            order.getTotalAmount()
+            order.getTotalAmount(),
+            order.getOrderDate()
         );
     }
-    
+
 }

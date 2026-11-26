@@ -33,7 +33,7 @@ public class OrderEventListener {
 
         try {
             OrderEmailDetails details = orderEmailDetailsService.getOrderEmailDetails(event.orderId());
-            emailService.sendOrderConfirmation(details.customerEmail(), event.orderId(), details.totalAmount());
+            emailService.sendOrderConfirmation(details);
             log.info("Order confirmation email sent for order ID: {}", event.orderId());
         } catch (MailException e) {
             log.error(

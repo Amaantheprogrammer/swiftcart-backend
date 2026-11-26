@@ -41,5 +41,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             WHERE o.user.id = :userId
            """)
     List<Order> findByUserId(@Param("userId") Long userId);
+    
+    @Query("""
+        SELECT o
+        FROM Order o
+        JOIN FETCH o.user
+        WHERE o.id = :orderId
+        """)
+    Optional<Order> findOrderWithUserById(@Param("orderId") Long orderId);
 
 }

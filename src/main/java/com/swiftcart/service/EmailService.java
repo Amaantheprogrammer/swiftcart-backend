@@ -1,10 +1,10 @@
 package com.swiftcart.service;
 
-import java.math.BigDecimal;
-
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import com.swiftcart.dto.OrderEmailDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,23 +14,29 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendOrderConfirmation(String recipient, Long orderId, BigDecimal totalAmount) {
+    public void sendOrderConfirmation(OrderEmailDetails details) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(recipient);
-        message.setSubject("Swiftcart - Order confirmation: #" + orderId);
+        message.setTo(details.customerEmail());
+        message.setSubject("Swiftcart - Order confirmation: #" + details.orderId());
         message.setText("""
-            Hi,
+            Hi %s,
 
-                Your order has been placed successfully!
+            Your order has been placed successfully!
 
-                Order ID: %d
-                Total Amount: ₹%.2f
+            Order ID: %d
+            Order Date: %s
+            Total Amount: ₹%s
 
-                Thank you for shopping with Swift Cart!
+            Thank you for shopping with Swift Cart!
 
-                Regards,
-                Swift Cart Team
-            """.formatted(orderId, totalAmount)
+            Regards,
+            Swift Cart Team
+            """.formatted(
+                details.customerName(),
+                details.orderId(),
+                details.orderDate(),
+                details.totalAmount().toPlainString()
+            )
         );
         mailSender.send(message);
     }
