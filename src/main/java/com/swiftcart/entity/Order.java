@@ -13,7 +13,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import lombok.*;
 
 @Getter
-@Setter 
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "orders")

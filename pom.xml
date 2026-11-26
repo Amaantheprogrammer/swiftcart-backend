@@ -124,6 +124,11 @@
             <artifactId>bucket4j_jdk17-lettuce</artifactId>
             <version>8.15.0</version>
         </dependency>
+        <!--Email dependency-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -9,10 +9,12 @@ import com.swiftcart.dto.request.*;
 import com.swiftcart.dto.response.*;
 import com.swiftcart.entity.*;
 import com.swiftcart.enums.*;
+import com.swiftcart.event.OrderPlacedEvent;
 import com.swiftcart.exception.*;
 import com.swiftcart.repository.*;
 import com.swiftcart.util.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -31,6 +33,7 @@ public class OrderService {
     private final ModelMapper modelMapper;
     private final DigitalBankingClientService digitalBankingClientService;
     private final CurrentUserUtil currentUserUtil;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -160,7 +163,11 @@ public class OrderService {
 
         productRepository.save(product);
 
-        return modelMapper.map(orderRepository.save(order), OrderResponse.class);
+        Order savedOrder = orderRepository.save(order);
+
+        eventPublisher.publishEvent(new OrderPlacedEvent(savedOrder.getId()));
+
+        return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
@@ -256,7 +263,11 @@ public class OrderService {
                 order.getOrderItems().add(orderItem);
             }
 
-            savedOrders.add(orderRepository.save(order));
+            Order savedOrder = orderRepository.save(order);
+
+            savedOrders.add(savedOrder);
+
+            eventPublisher.publishEvent(new OrderPlacedEvent(savedOrder.getId()));
         }
 
         cart.getCartItems().clear();
