@@ -198,9 +198,6 @@ public class ProductServiceTest {
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(existingProduct));
         when(currentUserUtil.getCurrentUser()).thenReturn(seller);
-        when(productRepository.save(any(Product.class))).thenAnswer(
-                invocation -> invocation.getArgument(0)
-        );
 
         ProductResponse expectedResponse = ProductResponse.builder()
                 .id(1L)

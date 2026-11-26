@@ -17,6 +17,7 @@ public class EmailService {
     public void sendOrderConfirmation(OrderEmailDetails details) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(details.customerEmail());
+        message.setFrom("a91861130@gmail.com");
         message.setSubject("Swiftcart - Order confirmation: #" + details.orderId());
         message.setText("""
             Hi %s,
