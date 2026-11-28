@@ -85,7 +85,7 @@ public class UserServiceTest {
                 .build();
         
         when(modelMapper.map(any(User.class), eq(UserResponse.class))).thenReturn(expectedUserResponse);
-        when(userRepository.findByEmail("samuel.johnson@gmail.com")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmailContainingIgnoreCase("samuel.johnson@gmail.com")).thenReturn(Optional.of(existingUser));
 
         UserResponse actualUserResponse = userService.getUserByEmail("samuel.johnson@gmail.com");
 
